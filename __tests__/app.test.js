@@ -42,13 +42,14 @@ describe("/api/articles/:articleId", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
             author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
             body: "I find this existence challenging",
+            topic: "mitch",
             created_at: "2020-07-09T21:11:00.000Z",
             votes: 100,
+            comment_count: 11,
           });
         });
     });
