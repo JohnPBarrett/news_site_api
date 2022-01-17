@@ -1,4 +1,4 @@
-const db = require("../../db/connection");
+const db = require("../db/connection");
 const format = require("pg-format");
 
 const insertTopicData = async (topicData) => {
@@ -69,12 +69,11 @@ const insertTableData = async (
   articleData,
   commentData
 ) => {
-
-
   await insertTopicData(topicData);
   await insertUserData(userData);
   await insertArticleData(articleData);
   await insertCommentData(commentData);
+
   return;
 };
 

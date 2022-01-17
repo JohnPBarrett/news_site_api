@@ -1,11 +1,10 @@
-const db = require("../connection");
-const createTables = require("../../utils/db/create_tables");
-const insertTableData = require("../../utils/db/insert_table_data");
-const format = require("pg-format");
+const createTables = require("../../utils/create_tables");
+const insertTableData = require("../../utils/insert_table_data");
 
 const seed = async (data) => {
-  const { articleData, commentData, topicData, userData } = data;
+  const { topicData, userData, articleData, commentData } = data;
   // 1. create tables
+
   try {
     await createTables();
     console.log("Tables successfully created");
@@ -15,7 +14,7 @@ const seed = async (data) => {
   }
   // 2. insert data
   try {
-    insertTableData(articleData, commentData, topicData, userData);
+    await insertTableData(topicData, userData, articleData, commentData);
     console.log("Database successfully seeded");
   } catch (err) {
     console.error("error in inserting data", err);

@@ -14,7 +14,6 @@ describe("/api/topics", () => {
         .get("/api/topics")
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
           expect(Array.isArray(body.topics)).toBe(true);
           body.topics.forEach((topic) => {
             expect(topic).toEqual(
@@ -25,6 +24,12 @@ describe("/api/topics", () => {
             );
           });
         });
+    });
+    it("returns a 404 and a message when path is incorrect", () => {
+      return request(app)
+        .get("/api/topic")
+        .expect(404)
+        .catch((err) => console.log(err));
     });
   });
 });

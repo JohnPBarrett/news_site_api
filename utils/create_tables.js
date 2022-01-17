@@ -1,4 +1,4 @@
-const db = require("../../db/connection");
+const db = require("../db/connection");
 
 const createTopicsTable = async () => {
   const query = `DROP TABLE IF EXISTS topics;
