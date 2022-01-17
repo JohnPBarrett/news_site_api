@@ -33,3 +33,40 @@ describe("/api/topics", () => {
     });
   });
 });
+
+describe("/api/articles/:articleId", () => {
+  describe("GET", () => {
+    it.only("server responds with 200 response and the test article", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T21:11:00.000Z",
+            votes: 100,
+          });
+        });
+    });
+    it.only("returns with 400 status and sends back message when trying to access an article that does not exist", () => {
+      return request(app)
+        .get("/api/articles/99999")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Article does not exist");
+        });
+    });
+    it.only("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
+      return request(app)
+        .get("/api/articles/apple")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
+        });
+    });
+  });
+});
