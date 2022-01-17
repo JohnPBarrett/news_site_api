@@ -1,14 +1,6 @@
 const topicRouter = require("express").Router();
-const { selectTopics } = require("../models/topics.models.js");
+const { getTopics } = require("../controllers/topics.controller");
 
-topicRouter.route("/").get((req, res) => {
-  try {
-    selectTopics().then(({ rows }) => {
-      res.status(200).send({ topics: rows });
-    });
-  } catch (err) {
-    return Promise.reject({ message: err, status: 400 });
-  }
-});
+topicRouter.route("/").get(getTopics);
 
 module.exports = topicRouter;

@@ -1,4 +1,4 @@
-const db = require("../connection");
+const db = require("../../db/connection");
 
 const createTopicsTable = async () => {
   const query = `DROP TABLE IF EXISTS topics;
@@ -66,4 +66,4 @@ const createTables = async () => {
   return;
 };
 
-module.exports = { createTables };
+module.exports = createTables;

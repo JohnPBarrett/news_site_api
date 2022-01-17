@@ -19,6 +19,6 @@ exports.handleServerErrors = (err, req, res, next) => {
   res.status(500).send({ message: "Internal server error" });
 };
 
-exports.handleInvalidEndpointErrors = (req, res) => {
+exports.handleInvalidEndpointErrors = (req, res, next) => {
   res.status(404).send({ message: "Path not found" });
 };
