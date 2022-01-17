@@ -5,14 +5,25 @@ const format = require("pg-format");
 const seed = async (data) => {
   const { articleData, commentData, topicData, userData } = data;
   // 1. create tables
-  await createTables();
+  try {
+    await createTables();
+    console.log("Tables successfully created");
+  } catch (err) {
+    console.error("error in creating tables", err);
+    throw err;
+  }
   // console.log(topicData);
   // 2. insert data
-  await insertTopicData(topicData);
-  await insertUserData(userData);
-  await insertArticleData(articleData);
-  await insertCommentData(commentData);
-  console.log("database successfully seeded");
+  try {
+    await insertTopicData(topicData);
+    await insertUserData(userData);
+    await insertArticleData(articleData);
+    await insertCommentData(commentData);
+    console.log("Database successfully seeded");
+  } catch (err) {
+    console.error("error in inserting data", err);
+    throw err;
+  }
 };
 
 const insertTopicData = async (topicData) => {
