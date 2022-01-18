@@ -81,13 +81,11 @@ exports.selectArticles = async (params) => {
 
   const result = await db.query(query, topic);
 
-  
   if (result.rows.length > 0) {
     return result.rows;
   } else {
     return Promise.reject({ status: 400, message: "Invalid topic value" });
   }
-
 };
 
 const sanitiseOrderAndSortQueryParams = (query, params, validFields) => {
@@ -115,3 +113,5 @@ const sanitiseOrderAndSortQueryParams = (query, params, validFields) => {
 
   return [query, topic];
 };
+
+exports.selectArticleComments = async (id) => {};

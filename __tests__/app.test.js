@@ -160,6 +160,7 @@ describe("/api/articles", () => {
             .expect(200)
             .then(({ body }) => {
               expect(Array.isArray(body.articles)).toBe(true);
+              expect(body.articles.length > 0).toBe(true);
               body.articles.forEach((article) => {
                 expect(article).toEqual(
                   expect.objectContaining({
@@ -262,6 +263,31 @@ describe("/api/articles", () => {
           expect(body.articles).toBeSortedBy("article_id");
           body.articles.forEach((article) => {
             expect(article.topic).toBe("mitch");
+          });
+        });
+    });
+  });
+});
+
+describe("/api/articles/:articleId/comments", () => {
+  describe.only("GET", () => {
+    it("returns a status of 200 and an array of comments for provided article id", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.comments)).toBe(true);
+          expect(body.comments.length > 1).toBe(true);
+          body.comments.forEach((comment) => {
+            expect(comment).toEqual(
+              expect.objectContaining({
+                comment_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+              })
+            );
           });
         });
     });

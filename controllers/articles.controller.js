@@ -2,6 +2,7 @@ const {
   selectArticle,
   updateArticle,
   selectArticles,
+  selectArticleComments
 } = require("../models/articles.models");
 
 exports.getArticle = async (req, res, next) => {
@@ -43,4 +44,15 @@ exports.getArticles = async (req, res, next) => {
     console.error(err);
     next(err);
   }
+};
+
+exports.getArticleComments = async (req, res, next) => {
+  const { articleId } = req.params;
+
+  try {
+    const articleComments = selectArticleComments(articleId);
+
+  } catch (err) {
+    next(err);
+}
 };
