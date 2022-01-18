@@ -2,7 +2,7 @@ const {
   selectArticle,
   updateArticle,
   selectArticles,
-  selectArticleComments
+  selectArticleComments,
 } = require("../models/articles.models");
 
 exports.getArticle = async (req, res, next) => {
@@ -50,9 +50,9 @@ exports.getArticleComments = async (req, res, next) => {
   const { articleId } = req.params;
 
   try {
-    const articleComments = selectArticleComments(articleId);
-
+    const comments = await selectArticleComments(articleId);
+    res.status(200).send({ comments });
   } catch (err) {
     next(err);
-}
+  }
 };

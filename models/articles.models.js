@@ -114,4 +114,23 @@ const sanitiseOrderAndSortQueryParams = (query, params, validFields) => {
   return [query, topic];
 };
 
-exports.selectArticleComments = async (id) => {};
+exports.selectArticleComments = async (id) => {
+  const query = `SELECT
+                  comment_id,
+                  votes,
+                  created_at,
+                  author,
+                  body
+                FROM 
+                  comments
+                WHERE
+                  article_id = $1;`;
+
+  const result = await db.query(query, [id]);
+
+  if (result.rows.length > 0) {
+    return result.rows;
+  } else {
+    return Promise.reject({ status: 400, message: "Article does not exist" });
+  }
+};

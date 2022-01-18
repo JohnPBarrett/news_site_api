@@ -276,6 +276,7 @@ describe("/api/articles/:articleId/comments", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
+          console.log(body);
           expect(Array.isArray(body.comments)).toBe(true);
           expect(body.comments.length > 1).toBe(true);
           body.comments.forEach((comment) => {
@@ -289,6 +290,22 @@ describe("/api/articles/:articleId/comments", () => {
               })
             );
           });
+        });
+    });
+    it("returns with 400 status and sends back message when trying to access comments on an article that does not exist", () => {
+      return request(app)
+        .get("/api/articles/99999/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Article does not exist");
+        });
+    });
+    it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
+      return request(app)
+        .get("/api/articles/apple/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
         });
     });
   });
