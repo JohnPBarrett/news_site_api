@@ -238,7 +238,6 @@ describe("/api/articles", () => {
           .get("/api/articles?topic=mitch")
           .expect(200)
           .then(({ body }) => {
-            console.log(body);
             body.articles.forEach((article) => {
               expect(article.topic).toBe("mitch");
             });
@@ -270,13 +269,12 @@ describe("/api/articles", () => {
 });
 
 describe("/api/articles/:articleId/comments", () => {
-  describe.only("GET", () => {
+  describe("GET", () => {
     it("returns a status of 200 and an array of comments for provided article id", () => {
       return request(app)
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
           expect(Array.isArray(body.comments)).toBe(true);
           expect(body.comments.length > 1).toBe(true);
           body.comments.forEach((comment) => {
@@ -290,6 +288,15 @@ describe("/api/articles/:articleId/comments", () => {
               })
             );
           });
+        });
+    });
+    it("returns a status of 200 and an empty array of comments when article contains 0 comments", () => {
+      return request(app)
+        .get("/api/articles/7/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.comments)).toBe(true);
+          expect(body.comments.length === 0).toBe(true);
         });
     });
     it("returns with 400 status and sends back message when trying to access comments on an article that does not exist", () => {

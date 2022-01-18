@@ -116,20 +116,30 @@ const sanitiseOrderAndSortQueryParams = (query, params, validFields) => {
 
 exports.selectArticleComments = async (id) => {
   const query = `SELECT
-                  comment_id,
-                  votes,
-                  created_at,
-                  author,
-                  body
+                  articles.article_id,
+                  comments.comment_id,
+                  comments.votes,
+                  comments.created_at,
+                  comments.author,
+                  comments.body
                 FROM 
+                  articles 
+                LEFT JOIN
                   comments
+                USING 
+                  (article_id)
                 WHERE
-                  article_id = $1;`;
+                  articles.article_id = $1;`;
 
   const result = await db.query(query, [id]);
 
   if (result.rows.length > 0) {
-    return result.rows;
+    if (result.rows[0].comment_id === null) {
+      // check for articles that have 0 comments
+      return []
+    } else {
+      return result.rows;
+    }
   } else {
     return Promise.reject({ status: 400, message: "Article does not exist" });
   }
