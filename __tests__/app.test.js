@@ -151,7 +151,7 @@ describe("/api/articles/:articleId", () => {
 });
 
 describe("/api/articles", () => {
-  describe.only("GET", () => {
+  describe("GET", () => {
     it("returns a 200 response and an array of article objects", () => {
       return request(app)
         .get("/api/articles")
@@ -171,6 +171,14 @@ describe("/api/articles", () => {
               })
             );
           });
+        });
+    });
+    it.only("By default function returns an array sorted by created_at", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("created_at");
         });
     });
   });

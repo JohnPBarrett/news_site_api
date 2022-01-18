@@ -67,7 +67,7 @@ exports.selectArticles = async () => {
                   USING 
                     (article_id)
                   ORDER BY 
-                    articles.article_id
+                    articles.created_at
                   ;`;
 
   const result = await db.query(query);
