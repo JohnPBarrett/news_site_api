@@ -49,3 +49,27 @@ exports.updateArticle = async (id, voteInc) => {
     return Promise.reject({ status: 400, message: "Article does not exist" });
   }
 };
+
+exports.selectArticles = async () => {
+  const query = `SELECT 
+                    articles.author, 
+                    title,
+                    articles.article_id, 
+                    topic, 
+                    articles.created_at, 
+                    articles.votes, 
+                    COALESCE(comment_count,0) AS comment_count
+                  FROM 
+                    articles 
+                  LEFT JOIN 
+                    (SELECT article_id, COUNT(comment_id)::int AS comment_count FROM comments GROUP BY 
+                    article_id) AS comments_table
+                  USING 
+                    (article_id)
+                  ORDER BY 
+                    articles.article_id
+                  ;`;
+
+  const result = await db.query(query);
+  return result.rows;
+};

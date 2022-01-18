@@ -70,7 +70,7 @@ describe("/api/articles/:articleId", () => {
         });
     });
   });
-  describe.only("PATCH", () => {
+  describe("PATCH", () => {
     it("Returns a 201 status and the updated article when receiving positive vote", () => {
       const voteInc = { inc_votes: 10 };
       return request(app)
@@ -137,7 +137,7 @@ describe("/api/articles/:articleId", () => {
           expect(body.message).toBe("Invalid input");
         });
     });
-    it.only("returns with 400 status and invalid field error when sending a body with the wrong field name", () => {
+    it("returns with 400 status and invalid field error when sending a body with the wrong field name", () => {
       const vote = { this_is_wrong: 1 };
       return request(app)
         .patch("/api/articles/1")
@@ -145,6 +145,32 @@ describe("/api/articles/:articleId", () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe("Invalid field body");
+        });
+    });
+  });
+});
+
+describe("/api/articles", () => {
+  describe.only("GET", () => {
+    it("returns a 200 response and an array of article objects", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.articles)).toBe(true);
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(Number),
+              })
+            );
+          });
         });
     });
   });
