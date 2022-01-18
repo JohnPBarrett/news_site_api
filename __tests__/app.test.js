@@ -150,7 +150,7 @@ describe("/api/articles/:articleId", () => {
   });
 });
 
-describe.only("/api/articles", () => {
+describe("/api/articles", () => {
   describe("GET", () => {
     describe("Ordering and sortby", () => {
       describe("General use testing", () => {
@@ -232,7 +232,7 @@ describe.only("/api/articles", () => {
       });
     });
     describe("Filtering by topic", () => {
-      it("function returns a 200 response an array of articles object with filtered topic", () => {
+      it("function returns a 200 response and an array of articles object with filtered topic", () => {
         return request(app)
           .get("/api/articles?topic=mitch")
           .expect(200)
@@ -243,6 +243,27 @@ describe.only("/api/articles", () => {
             });
           });
       });
+      it("function returns a 400 response and an error message when providing invalid topic value", () => {
+        return request(app)
+          .get("/api/articles?topic=milk")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Invalid topic value");
+          });
+      });
+    });
+    it("function can use all query params and sends back a 200 response with an array of articles", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id&topic=mitch&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.articles)).toBe(true);
+          expect(body.articles.length > 0).toBe(true);
+          expect(body.articles).toBeSortedBy("article_id");
+          body.articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
     });
   });
 });
