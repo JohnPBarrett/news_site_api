@@ -9,17 +9,19 @@ exports.selectArticle = async (id) => {
                     topic, 
                     articles.created_at, 
                     articles.votes, 
-                    CAST(count(comment_id) AS int) AS comment_count
+                    CAST(comment_count AS int) 
                   FROM 
                     articles 
                   LEFT JOIN 
-                    comments 
+                    (SELECT article_id, count(comment_id) AS comment_count FROM comments GROUP BY 
+                    article_id) AS comments_table
                   USING 
                     (article_id)
                   WHERE
-                    articles.article_id = $1  
-                  GROUP BY 
-                    articles.article_id;`;
+                    articles.article_id = $1
+                  ORDER BY 
+                    articles.article_id
+                  ;`;
 
   const result = await db.query(query, [id]);
 
