@@ -36,7 +36,7 @@ describe("/api/topics", () => {
 
 describe("/api/articles/:articleId", () => {
   describe("GET", () => {
-    it.only("server responds with 200 response and the test article", () => {
+    it("server responds with 200 response and the test article", () => {
       return request(app)
         .get("/api/articles/1")
         .expect(200)
@@ -53,7 +53,7 @@ describe("/api/articles/:articleId", () => {
           });
         });
     });
-    it.only("returns with 400 status and sends back message when trying to access an article that does not exist", () => {
+    it("returns with 400 status and sends back message when trying to access an article that does not exist", () => {
       return request(app)
         .get("/api/articles/99999")
         .expect(400)
@@ -61,12 +61,90 @@ describe("/api/articles/:articleId", () => {
           expect(body.message).toBe("Article does not exist");
         });
     });
-    it.only("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
+    it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
       return request(app)
         .get("/api/articles/apple")
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe("Invalid input");
+        });
+    });
+  });
+  describe.only("PATCH", () => {
+    it("Returns a 201 status and the updated article when receiving positive vote", () => {
+      const voteInc = { inc_votes: 10 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(voteInc)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            body: "I find this existence challenging",
+            topic: "mitch",
+            created_at: "2020-07-09T21:11:00.000Z",
+            votes: 110,
+          });
+        });
+    });
+    it("Returns a 201 status and the updated article when receiving negative vote", () => {
+      const voteInc = { inc_votes: -150 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(voteInc)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            body: "I find this existence challenging",
+            topic: "mitch",
+            created_at: "2020-07-09T21:11:00.000Z",
+            votes: -50,
+          });
+        });
+    });
+    it("returns with 400 status and sends back message when trying to update an article that does not exist", () => {
+      const vote = { inc_votes: 40 };
+      return request(app)
+        .patch("/api/articles/99999")
+        .send(vote)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Article does not exist");
+        });
+    });
+    it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
+      const vote = { inc_votes: 40 };
+      return request(app)
+        .patch("/api/articles/apple")
+        .send(vote)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
+        });
+    });
+    it("returns with 400 status and psql error when trying to update with incorrect value data type", () => {
+      const vote = { inc_votes: "honey" };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(vote)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
+        });
+    });
+    it.only("returns with 400 status and invalid field error when sending a body with the wrong field name", () => {
+      const vote = { this_is_wrong: 1 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(vote)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid field body");
         });
     });
   });

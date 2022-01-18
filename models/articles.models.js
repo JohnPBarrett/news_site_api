@@ -31,3 +31,21 @@ exports.selectArticle = async (id) => {
     return Promise.reject({ status: 400, message: "Article does not exist" });
   }
 };
+
+exports.updateArticle = async (id, voteInc) => {
+  const query = `UPDATE 
+                    articles
+                  SET 
+                    votes = votes + $2
+                  WHERE
+                    article_id = $1
+                  RETURNING *;`;
+
+  const result = await db.query(query, [id, voteInc]);
+
+  if (result.rows.length > 0) {
+    return result.rows[0];
+  } else {
+    return Promise.reject({ status: 400, message: "Article does not exist" });
+  }
+};

@@ -1,6 +1,8 @@
 exports.handleCustomErrors = (err, req, res, next) => {
   if (err.status) {
-    res.status(400).send({ message: err.message });
+    res.status(err.status).send({ message: err.message });
+  } else if (err === "Invalid field body") {
+    res.status(400).send({ message: err });
   } else {
     next(err);
   }
