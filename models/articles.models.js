@@ -50,26 +50,61 @@ exports.updateArticle = async (id, voteInc) => {
   }
 };
 
-exports.selectArticles = async () => {
-  const query = `SELECT 
-                    articles.author, 
+exports.selectArticles = async (params) => {
+  let query = `SELECT 
+                    author, 
                     title,
                     articles.article_id, 
                     topic, 
-                    articles.created_at, 
-                    articles.votes, 
+                    created_at, 
+                    votes, 
                     COALESCE(comment_count,0) AS comment_count
                   FROM 
                     articles 
                   LEFT JOIN 
-                    (SELECT article_id, COUNT(comment_id)::int AS comment_count FROM comments GROUP BY 
+                    (SELECT article_id AS comment_article_id, COUNT(comment_id)::int AS comment_count FROM comments GROUP BY 
                     article_id) AS comments_table
-                  USING 
-                    (article_id)
-                  ORDER BY 
-                    articles.created_at
-                  ;`;
+                  ON
+                    articles.article_id = comment_article_id`;
+  const validFields = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+  let topic;
 
-  const result = await db.query(query);
+  [query, topic] = sanitiseOrderAndSortQueryParams(query, params, validFields);
+
+  const result = await db.query(query, topic);
   return result.rows;
+};
+
+const sanitiseOrderAndSortQueryParams = (query, params, validFields) => {
+  const newParams = { ...params };
+  const topic = [];
+
+  const sortBy = newParams.sort_by || "created_at";
+  let order = newParams.order || "DESC";
+  order = order.toUpperCase();
+
+  if (!validFields.includes(sortBy)) {
+    throw "Invalid sort field";
+  }
+
+  if (!(order === "ASC" || order === "DESC")) {
+    throw "Invalid order field";
+  }
+
+  if (params.topic) {
+    topic.push(params.topic);
+    query += ` WHERE topic = $1 `;
+  }
+
+  query += ` ORDER BY ${sortBy} ${order};`;
+
+  return [query, topic];
 };

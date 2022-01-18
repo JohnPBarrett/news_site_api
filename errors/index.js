@@ -1,7 +1,13 @@
 exports.handleCustomErrors = (err, req, res, next) => {
+  // for when errors are thrown and only receive an error message
+  const customErrorMessages = [
+    "Invalid field body",
+    "Invalid sort field",
+    "Invalid order field",
+  ];
   if (err.status) {
     res.status(err.status).send({ message: err.message });
-  } else if (err === "Invalid field body") {
+  } else if (customErrorMessages.includes(err)) {
     res.status(400).send({ message: err });
   } else {
     next(err);

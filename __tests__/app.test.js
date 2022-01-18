@@ -150,36 +150,99 @@ describe("/api/articles/:articleId", () => {
   });
 });
 
-describe("/api/articles", () => {
+describe.only("/api/articles", () => {
   describe("GET", () => {
-    it("returns a 200 response and an array of article objects", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body }) => {
-          expect(Array.isArray(body.articles)).toBe(true);
-          body.articles.forEach((article) => {
-            expect(article).toEqual(
-              expect.objectContaining({
-                author: expect.any(String),
-                title: expect.any(String),
-                article_id: expect.any(Number),
-                topic: expect.any(String),
-                created_at: expect.any(String),
-                votes: expect.any(Number),
-                comment_count: expect.any(Number),
-              })
-            );
-          });
+    describe("Ordering and sortby", () => {
+      describe("General use testing", () => {
+        it("returns a 200 response and an array of article objects when no parameters given", () => {
+          return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({ body }) => {
+              expect(Array.isArray(body.articles)).toBe(true);
+              body.articles.forEach((article) => {
+                expect(article).toEqual(
+                  expect.objectContaining({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(Number),
+                  })
+                );
+              });
+            });
         });
+        it("By default function returns an array sorted by created_at in descending order", () => {
+          return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy("created_at", {
+                descending: true,
+              });
+            });
+        });
+        it("function sorts by provided sort_by query param in descending order", () => {
+          return request(app)
+            .get("/api/articles?sort_by=article_id")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy("article_id", {
+                descending: true,
+              });
+            });
+        });
+        it("function sorts by created_at in order of provided order query param", () => {
+          return request(app)
+            .get("/api/articles?order=asc")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy("created_at");
+            });
+        });
+        it("function sorts by both sortBy and in order of provided query params", () => {
+          return request(app)
+            .get("/api/articles?sort_by=votes&order=asc")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy("votes");
+            });
+        });
+      });
+      describe("Error testing", () => {
+        it("Function returns a 400 and an error message when provided a sort_by field that does not exist", () => {
+          return request(app)
+            .get("/api/articles?sort_by=apple")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.message).toBe("Invalid sort field");
+            });
+        });
+        it("Function returns a 400 and an error message when provided an invalid order value", () => {
+          return request(app)
+            .get("/api/articles?order=lemon")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.message).toBe("Invalid order field");
+            });
+        });
+      });
     });
-    it.only("By default function returns an array sorted by created_at", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles).toBeSortedBy("created_at");
-        });
+    describe("Filtering by topic", () => {
+      it("function returns a 200 response an array of articles object with filtered topic", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body);
+            body.articles.forEach((article) => {
+              expect(article.topic).toBe("mitch");
+            });
+          });
+      });
     });
   });
 });
