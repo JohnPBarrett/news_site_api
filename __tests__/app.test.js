@@ -457,3 +457,31 @@ describe("/api/comments/:commentId", () => {
     });
   });
 });
+
+describe("/api/users", () => {
+  describe("GET", () => {
+    it("returns a status of 200 and an array of user objects", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.users)).toBe(true);
+          body.users.forEach((user) => {
+            expect(user).toEqual(
+              expect.objectContaining({
+                username: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    it("returns a status of 404 when path is incorrect", () => {
+      return request(app)
+        .get("/api/user")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).toBe("Path not found");
+        });
+    });
+  });
+});
