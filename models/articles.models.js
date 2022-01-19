@@ -130,8 +130,6 @@ const sanitiseQuery = (query, params, validFields) => {
 
   query += ` LIMIT ${limit} OFFSET ${offset};`;
 
-  console.log(query);
-
   return [query, topic];
 };
 

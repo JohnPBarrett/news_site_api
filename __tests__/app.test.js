@@ -245,7 +245,7 @@ describe("/api/articles", () => {
         });
       });
     });
-    describe.only("Pagination", () => {
+    describe("Pagination", () => {
       it("by default the endpoint will only return 10 results and does not have any offsets", () => {
         return request(app)
           .get("/api/articles?sort_by=article_id&order=asc")
@@ -273,6 +273,27 @@ describe("/api/articles", () => {
             expect(body.articles.length).toBe(2);
             body.articles.forEach((article) => {
               expect(article.article_id === 5 || article.article_id === 6).toBe(
+                true
+              );
+            });
+          });
+      });
+      it("endpoint will give default limit value if limit has an incorrect data type", () => {
+        return request(app)
+          .get("/api/articles?limit=butter")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(10);
+          });
+      });
+      it("endpoint will give first page if offset value has an incorrect data type", () => {
+        return request(app)
+          .get("/api/articles?p=berry&limit=2&sort_by=article_id&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(2);
+            body.articles.forEach((article) => {
+              expect(article.article_id === 1 || article.article_id === 2).toBe(
                 true
               );
             });
