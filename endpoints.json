@@ -82,5 +82,19 @@
   "DELETE /api/comments/:commentId": {
     "description": "deletes comment corresponding to commentId param and returns a 204 status",
     "params": ["commentId"]
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users from db",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "Homer"
+        },
+        {
+          "username": "Bart"
+        }
+      ]
+    }
   }
 }
