@@ -96,5 +96,14 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "returns userObject when supplied with valid username",
+    "params": ["username"],
+    "exampleResponse": {
+      "username": "Batman",
+      "avatar_url": "Bat_signal.jpg",
+      "name": "Not_Bruce_Wayne"
+    }
   }
 }
