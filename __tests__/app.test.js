@@ -245,6 +245,40 @@ describe("/api/articles", () => {
         });
       });
     });
+    describe.only("Pagination", () => {
+      it("by default the endpoint will only return 10 results and does not have any offsets", () => {
+        return request(app)
+          .get("/api/articles?sort_by=article_id&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(10);
+            body.articles.forEach((article) => {
+              expect(article.article_id < 11).toBe(true);
+            });
+          });
+      });
+      it("endpoint will return results specified by limit paramter ", () => {
+        return request(app)
+          .get("/api/articles?limit=7")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(7);
+          });
+      });
+      it("endpoint will offset results specified by p parameter", () => {
+        return request(app)
+          .get("/api/articles?p=3&limit=2&sort_by=article_id&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(2);
+            body.articles.forEach((article) => {
+              expect(article.article_id === 5 || article.article_id === 6).toBe(
+                true
+              );
+            });
+          });
+      });
+    });
     describe("Filtering by topic", () => {
       it("function returns a 200 response and an array of articles object with filtered topic", () => {
         return request(app)

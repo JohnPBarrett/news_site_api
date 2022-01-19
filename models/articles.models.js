@@ -27,7 +27,7 @@ exports.selectArticles = async (params) => {
   ];
   let topic;
 
-  [query, topic] = sanitiseOrderAndSortQueryParams(query, params, validFields);
+  [query, topic] = sanitiseQuery(query, params, validFields);
 
   const result = await db.query(query, topic);
 
@@ -88,12 +88,16 @@ exports.updateArticle = async (id, voteInc) => {
   }
 };
 
-const sanitiseOrderAndSortQueryParams = (query, params, validFields) => {
+const sanitiseQuery = (query, params, validFields) => {
   const newParams = { ...params };
   const topic = [];
 
   const sortBy = newParams.sort_by || "created_at";
   let order = newParams.order || "DESC";
+  let limit;
+  let offset;
+
+  // santise for sort & order params
   order = order.toUpperCase();
 
   if (!validFields.includes(sortBy)) {
@@ -104,12 +108,29 @@ const sanitiseOrderAndSortQueryParams = (query, params, validFields) => {
     throw "Invalid order field";
   }
 
+  // sanitise for limit and page params
+  if (newParams.limit && newParams.limit > 0) {
+    limit = newParams.limit;
+  } else {
+    limit = 10;
+  }
+
+  if (newParams.p && newParams.p > 0) {
+    offset = (newParams.p - 1) * limit;
+  } else {
+    offset = 0;
+  }
+
   if (params.topic) {
     topic.push(params.topic);
     query += ` WHERE topic = $1 `;
   }
 
-  query += ` ORDER BY ${sortBy} ${order};`;
+  query += ` ORDER BY ${sortBy} ${order}`;
+
+  query += ` LIMIT ${limit} OFFSET ${offset};`;
+
+  console.log(query);
 
   return [query, topic];
 };
