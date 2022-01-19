@@ -6,6 +6,15 @@ const {
   insertArticleComment,
 } = require("../models/articles.models");
 
+exports.getArticles = async (req, res, next) => {
+  try {
+    const articles = await selectArticles(req.query);
+    res.status(200).send({ articles });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
 exports.getArticle = async (req, res, next) => {
   try {
     const { articleId } = req.params;
@@ -33,16 +42,6 @@ exports.patchArticle = async (req, res, next) => {
 
     res.status(201).send(updatedArticle);
   } catch (err) {
-    next(err);
-  }
-};
-
-exports.getArticles = async (req, res, next) => {
-  try {
-    const articles = await selectArticles(req.query);
-    res.status(200).send({ articles });
-  } catch (err) {
-    console.error(err);
     next(err);
   }
 };

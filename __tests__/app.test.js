@@ -7,7 +7,7 @@ const request = require("supertest");
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
-describe.only("/api", () => {
+describe("/api", () => {
   it("returns json file detailing all developed endpoints", () => {
     return request(app)
       .get("/api")

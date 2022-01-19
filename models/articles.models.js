@@ -1,5 +1,43 @@
 const db = require("../db/connection");
 
+exports.selectArticles = async (params) => {
+  let query = `SELECT 
+                    author, 
+                    title,
+                    articles.article_id, 
+                    topic, 
+                    created_at, 
+                    votes, 
+                    COALESCE(comment_count,0) AS comment_count
+                  FROM 
+                    articles 
+                  LEFT JOIN 
+                    (SELECT article_id AS comment_article_id, COUNT(comment_id)::int AS comment_count FROM comments GROUP BY 
+                    article_id) AS comments_table
+                  ON
+                    articles.article_id = comment_article_id`;
+  const validFields = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+  let topic;
+
+  [query, topic] = sanitiseOrderAndSortQueryParams(query, params, validFields);
+
+  const result = await db.query(query, topic);
+
+  if (result.rows.length > 0) {
+    return result.rows;
+  } else {
+    return Promise.reject({ status: 400, message: "Invalid topic value" });
+  }
+};
+
 exports.selectArticle = async (id) => {
   const query = `SELECT 
                     articles.author, 
@@ -47,44 +85,6 @@ exports.updateArticle = async (id, voteInc) => {
     return result.rows[0];
   } else {
     return Promise.reject({ status: 400, message: "Article does not exist" });
-  }
-};
-
-exports.selectArticles = async (params) => {
-  let query = `SELECT 
-                    author, 
-                    title,
-                    articles.article_id, 
-                    topic, 
-                    created_at, 
-                    votes, 
-                    COALESCE(comment_count,0) AS comment_count
-                  FROM 
-                    articles 
-                  LEFT JOIN 
-                    (SELECT article_id AS comment_article_id, COUNT(comment_id)::int AS comment_count FROM comments GROUP BY 
-                    article_id) AS comments_table
-                  ON
-                    articles.article_id = comment_article_id`;
-  const validFields = [
-    "author",
-    "title",
-    "article_id",
-    "topic",
-    "created_at",
-    "votes",
-    "comment_count",
-  ];
-  let topic;
-
-  [query, topic] = sanitiseOrderAndSortQueryParams(query, params, validFields);
-
-  const result = await db.query(query, topic);
-
-  if (result.rows.length > 0) {
-    return result.rows;
-  } else {
-    return Promise.reject({ status: 400, message: "Invalid topic value" });
   }
 };
 

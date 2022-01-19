@@ -11,17 +11,76 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
           "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
+          "title": "Seafood substitutions are increasing",
+          "article_id": 12,
+          "topic": "cooking",
+          "created_at": "1527695953341",
+          "votes": 12,
+          "comment_count": 2
         }
       ]
     }
+  },
+  "GET /api/articles/:articleId": {
+    "description": "serves a single article object corresponding to articleId param",
+    "params": ["articleId"],
+    "exampleResponse": {
+      "author": "butter_bridge",
+      "title": "Living in the shadow of a great man",
+      "article_id": 1,
+      "body": "I find this existence challenging",
+      "topic": "mitch",
+      "created_at": "2020-07-09T21:11:00.000Z",
+      "votes": 100,
+      "comment_count": 11
+    }
+  },
+  "PATCH /api/articles/:articleId": {
+    "description": "updates votes on article corresponding to inc_votes value and serves newly update article",
+    "params": ["articleId"],
+    "exampleRequestBody": { "inc_votes": 2 },
+    "exampleResponse": {
+      "author": "butter_bridge",
+      "title": "Living in the shadow of a great man",
+      "article_id": 1,
+      "body": "I find this existence challenging",
+      "topic": "mitch",
+      "created_at": "2020-07-09T21:11:00.000Z",
+      "votes": 110
+    }
+  },
+  "GET /api/articles/:articleId/comments": {
+    "description": "Serves an array of all comments corresponding to articleId param",
+    "params": ["articleId"],
+    "exampleResponse": [
+      {
+        "comment_id": 3,
+        "votes": 3,
+        "created_at": "1527695953341",
+        "author": "icellusedkars",
+        "body": "beautiful thing about treasure is that it exists."
+      }
+    ]
+  },
+  "POST /api/articles/:articleId/comments": {
+    "description": "adds a new comment to article corresponding to articleId param then serves newly created comment",
+    "params": ["articleId"],
+    "exampleResponse": {
+      "comment_id": 7,
+      "author": "icellusedkars",
+      "article_id": 9,
+      "votes": 0,
+      "created_at": "1527695953341",
+      "body": "beautiful thing about treasure is that it exists."
+    }
+  },
+  "DELETE /api/comments/:commentId": {
+    "description": "deletes comment corresponding to commentId param and returns a 204 status",
+    "params": ["commentId"]
   }
 }
