@@ -184,6 +184,7 @@ describe("/api/articles", () => {
                     created_at: expect.any(String),
                     votes: expect.any(Number),
                     comment_count: expect.any(Number),
+                    total_count: expect.any(Number),
                   })
                 );
               });
@@ -299,6 +300,17 @@ describe("/api/articles", () => {
             });
           });
       });
+      it("total_count parameter does not change when limit field is used as long as no other filter is present", () => {
+        return request(app)
+          .get("/api/articles?limit=3")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(3);
+            body.articles.forEach((article) => {
+              expect(article.total_count).toBe(12);
+            });
+          });
+      });
     });
     describe("Filtering by topic", () => {
       it("function returns a 200 response and an array of articles object with filtered topic", () => {
@@ -317,6 +329,16 @@ describe("/api/articles", () => {
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid topic value");
+          });
+      });
+      it("total_count parameter will change depending on filtered topic", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body }) => {
+            body.articles.forEach((article) => {
+              expect(article.total_count).toBe(11);
+            });
           });
       });
     });
