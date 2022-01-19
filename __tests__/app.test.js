@@ -485,3 +485,37 @@ describe("/api/users", () => {
     });
   });
 });
+
+describe("/api/users/:username", () => {
+  describe("GET", () => {
+    it("returns a status of 200 and the user object", () => {
+      return request(app)
+        .get("/api/users/rogersop")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            username: "rogersop",
+            avatar_url:
+              "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+            name: "paul",
+          });
+        });
+    });
+    it("returns a status of 400 and an error message when attempting to retrieve a user that does not exist", () => {
+      return request(app)
+        .get("/api/users/MrBean")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("User does not exist");
+        });
+    });
+    it("returns a status of 400 and an error message when attempting use an invalid value", () => {
+      return request(app)
+        .get("/api/users/1")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("User does not exist");
+        });
+    });
+  });
+});
