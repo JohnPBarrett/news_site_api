@@ -316,7 +316,7 @@ describe("/api/articles/:articleId/comments", () => {
         });
     });
   });
-  describe.only("POST", () => {
+  describe("POST", () => {
     it("returns a 201 status and the newly created comment", () => {
       const newComment = {
         username: "icellusedkars",
@@ -353,10 +353,63 @@ describe("/api/articles/:articleId/comments", () => {
           expect(body.message).toBe("Invalid field body");
         });
     });
+    it("returns a 400 status when sending a post request to an article that does not exist", () => {
+      const comment = {
+        username: "icellusedkars",
+        body: "This is a test",
+      };
 
+      return request(app)
+        .post("/api/articles/12345678/comments")
+        .send(comment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Value/s violate foreign key restraint");
+        });
+    });
+    it("returns a 400 status when sending a post request with a null value", () => {
+      const badComment = {
+        username: "icellusedkars",
+        body: null,
+      };
 
-    // check for valid article
-    // check fields aren't null
-    // check valid username
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(badComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Fields cannot be null values");
+        });
+    });
+    it("returns a 400 status when sending a post request with a username that does not exist", () => {
+      const badComment = {
+        username: "fakeName",
+        body: "Something to write about",
+      };
+
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(badComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Value/s violate foreign key restraint");
+        });
+    });
+  });
+});
+
+describe("/api/comments/:commentId", () => {
+  describe("DELETE", () => {
+    it.only("returns a 204 status and no body when deleting valid comment", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .expect(204)
+        .then(() => {
+          return db.query("SELECT * FROM comments WHERE comment_id = 1");
+        })
+        .then((result) => {
+          expect(result.rows.length).toBe(0);
+        });
+    });
   });
 });
