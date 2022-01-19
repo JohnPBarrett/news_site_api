@@ -7,6 +7,19 @@ const request = require("supertest");
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
+describe.only("/api", () => {
+  it("returns json file detailing all developed endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        for (let key in body) {
+          expect(body[key].description).not.toBe(null);
+        }
+      });
+  });
+});
+
 describe("/api/topics", () => {
   describe("GET", () => {
     it("get request to /api/topics will return a status 200 and an array of objects with each topic", () => {
