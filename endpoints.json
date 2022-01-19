@@ -41,7 +41,7 @@
     }
   },
   "PATCH /api/articles/:articleId": {
-    "description": "updates votes on article corresponding to inc_votes value and serves newly update article",
+    "description": "updates votes on article corresponding to inc_votes value and serves newly update article with 201 status",
     "params": ["articleId"],
     "exampleRequestBody": { "inc_votes": 2 },
     "exampleResponse": {
@@ -82,6 +82,19 @@
   "DELETE /api/comments/:commentId": {
     "description": "deletes comment corresponding to commentId param and returns a 204 status",
     "params": ["commentId"]
+  },
+  "PATCH /api/comments/:commentId": {
+    "description": "updates votes on comment corresponding to inc_votes value and serves newly update comment with 201 status",
+    "params": ["commentId"],
+    "exampleRequestBody": { "inc_votes": 3 },
+    "exampleResponse": {
+      "comment_id": 1,
+      "author": "butter_bridge",
+      "article_id": 9,
+      "votes": 18,
+      "created_at": "2020-04-06T13:17:00.000Z",
+      "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+    }
   },
   "GET /api/users": {
     "description": "serves an array of all users from db",
