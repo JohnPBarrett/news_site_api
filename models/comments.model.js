@@ -14,3 +14,16 @@ exports.removeComment = async (id) => {
     return;
   }
 };
+
+exports.updateComment = async (id, voteInc) => {
+  const query = `UPDATE
+                  comments
+                SET
+                  votes = votes + $2
+                WHERE
+                  comment_id = $1
+                RETURNING *;`;
+
+  const result = await db.query(query, [id, voteInc]);
+  return result.rows[0];
+};

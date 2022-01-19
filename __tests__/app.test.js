@@ -456,6 +456,27 @@ describe("/api/comments/:commentId", () => {
         });
     });
   });
+  describe.only("PATCH", () => {
+    it("returns a 201 and the comment with updated vote amount", () => {
+      const voteInc = {
+        inc_votes: 2,
+      };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(voteInc)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            comment_id: 1,
+            author: "butter_bridge",
+            article_id: 9,
+            votes: 18,
+            created_at: "2020-04-06T13:17:00.000Z",
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          });
+        });
+    });
+  });
 });
 
 describe("/api/users", () => {
