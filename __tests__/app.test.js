@@ -395,20 +395,51 @@ describe("/api/articles/:articleId/comments", () => {
           expect(body.message).toBe("Value/s violate foreign key restraint");
         });
     });
+    it("returns a 400 status when sending a post request with an invalid value for article_id", () => {
+      const comment = {
+        username: "icellusedkars",
+        body: "This is a test",
+      };
+
+      return request(app)
+        .post("/api/articles/apple/comments")
+        .send(comment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
+        });
+    });
   });
 });
 
 describe("/api/comments/:commentId", () => {
   describe("DELETE", () => {
-    it.only("returns a 204 status and no body when deleting valid comment", () => {
+    it("returns a 204 status and no body when deleting valid comment", () => {
       return request(app)
         .delete("/api/comments/1")
         .expect(204)
-        .then(() => {
+        .then((response) => {
+          expect(response.body).toEqual({});
           return db.query("SELECT * FROM comments WHERE comment_id = 1");
         })
         .then((result) => {
           expect(result.rows.length).toBe(0);
+        });
+    });
+    it("returns a 400 status and an error message when attempting to delete a comment that does not exist", () => {
+      return request(app)
+        .delete("/api/comments/999999")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Comment does not exist");
+        });
+    });
+    it("returns a 400 status and an error message when attempting to delete a comment that does not exist", () => {
+      return request(app)
+        .delete("/api/comments/apple")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
         });
     });
   });
