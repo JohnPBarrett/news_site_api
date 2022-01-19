@@ -3,6 +3,7 @@ const {
   updateArticle,
   selectArticles,
   selectArticleComments,
+  insertArticleComment,
 } = require("../models/articles.models");
 
 exports.getArticle = async (req, res, next) => {
@@ -52,6 +53,17 @@ exports.getArticleComments = async (req, res, next) => {
   try {
     const comments = await selectArticleComments(articleId);
     res.status(200).send({ comments });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.postArticleComment = async (req, res, next) => {
+  const { articleId } = req.params;
+
+  try {
+    const newComment = await insertArticleComment(articleId, req.body);
+    res.status(201).send(newComment);
   } catch (err) {
     next(err);
   }

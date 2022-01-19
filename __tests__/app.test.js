@@ -316,4 +316,47 @@ describe("/api/articles/:articleId/comments", () => {
         });
     });
   });
+  describe.only("POST", () => {
+    it("returns a 201 status and the newly created comment", () => {
+      const newComment = {
+        username: "icellusedkars",
+        body: "This is a test",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              author: newComment.username,
+              article_id: 1,
+              votes: 0,
+              created_at: expect.any(String),
+              body: newComment.body,
+            })
+          );
+        });
+    });
+    it("returns a 400 status when sending a body that has a key that is invalid", () => {
+      const badComment = {
+        user: "icellusedkars",
+        body: "This is a test",
+      };
+
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(badComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid field body");
+        });
+    });
+
+
+    // check for valid article
+    // check fields aren't null
+    // check valid username
+  });
 });

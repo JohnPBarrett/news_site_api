@@ -136,11 +136,34 @@ exports.selectArticleComments = async (id) => {
   if (result.rows.length > 0) {
     if (result.rows[0].comment_id === null) {
       // check for articles that have 0 comments
-      return []
+      return [];
     } else {
       return result.rows;
     }
   } else {
     return Promise.reject({ status: 400, message: "Article does not exist" });
   }
+};
+
+exports.insertArticleComment = async (id, queryBody) => {
+  const validFields = ["username", "body"];
+  const query = `INSERT INTO 
+                  comments( article_id, author, body)
+                VALUES 
+                  ($1, $2, $3)
+                RETURNING *;`;
+
+  for (const key in queryBody) {
+    if (!validFields.includes(key)) {
+      throw "Invalid field body";
+    }
+  }
+
+  const result = await db.query(query, [
+    id,
+    queryBody.username,
+    queryBody.body,
+  ]);
+
+  return result.rows[0];
 };
