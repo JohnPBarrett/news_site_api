@@ -24,6 +24,17 @@ exports.updateComment = async (id, voteInc) => {
                   comment_id = $1
                 RETURNING *;`;
 
-  const result = await db.query(query, [id, voteInc]);
-  return result.rows[0];
+  for (let key in voteInc) {
+    if (key !== "inc_votes") {
+      throw "Invalid field body";
+    }
+  }
+
+  const result = await db.query(query, [id, voteInc.inc_votes]);
+
+  if (result.rows.length > 0) {
+    return result.rows[0];
+  } else {
+    return Promise.reject({ status: 400, message: "Comment does not exist" });
+  }
 };

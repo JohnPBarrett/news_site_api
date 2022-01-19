@@ -26,7 +26,7 @@ const createArticlesTable = async () => {
                   article_id SERIAL PRIMARY KEY,
                   title VARCHAR(255) NOT NULL,
                   body TEXT NOT NULL,
-                  votes INTEGER DEFAULT 0,
+                  votes INTEGER DEFAULT 0 NOT NULL,
                   topic VARCHAR(255) REFERENCES topics(slug) NOT NULL,
                   author VARCHAR(30) REFERENCES users(username) NOT NULL,
                   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -40,7 +40,7 @@ const createCommentTable = async () => {
                     comment_id SERIAL PRIMARY KEY,
                     author VARCHAR(30) REFERENCES users(username) NOT NULL,
                     article_id INT REFERENCES articles(article_id) NOT NULL,
-                    votes INT DEFAULT 0,
+                    votes INT DEFAULT 0 NOT NULL,
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     body TEXT NOT NULL
                   );`;

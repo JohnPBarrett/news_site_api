@@ -456,8 +456,8 @@ describe("/api/comments/:commentId", () => {
         });
     });
   });
-  describe.only("PATCH", () => {
-    it("returns a 201 and the comment with updated vote amount", () => {
+  describe("PATCH", () => {
+    it("returns a 201 and the comment with updated postive vote amount", () => {
       const voteInc = {
         inc_votes: 2,
       };
@@ -474,6 +474,90 @@ describe("/api/comments/:commentId", () => {
             created_at: "2020-04-06T13:17:00.000Z",
             body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
           });
+        });
+    });
+    it("returns a 201 and the comment with updated negative vote amount", () => {
+      const voteInc = {
+        inc_votes: -6,
+      };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(voteInc)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            comment_id: 1,
+            author: "butter_bridge",
+            article_id: 9,
+            votes: 10,
+            created_at: "2020-04-06T13:17:00.000Z",
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          });
+        });
+    });
+    it("returns a 400 and a message when given a commentId that does not exist", () => {
+      const voteInc = {
+        inc_votes: -6,
+      };
+
+      return request(app)
+        .patch("/api/comments/123578")
+        .send(voteInc)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Comment does not exist");
+        });
+    });
+    it("returns a 400 and a message when given a commentId that has the incorrect data type", () => {
+      const voteInc = {
+        inc_votes: 3,
+      };
+
+      return request(app)
+        .patch("/api/comments/apple")
+        .send(voteInc)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
+        });
+    });
+    it("returns a 400 and a message when given the wrong body key", () => {
+      const badVoteInc = {
+        inc_votes_bad: 3,
+      };
+
+      return request(app)
+        .patch("/api/comments/1")
+        .send(badVoteInc)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid field body");
+        });
+    });
+    it("returns a 400 and a psql error message when given the wrong body value data type", () => {
+      const badVoteInc = {
+        inc_votes: "apple",
+      };
+
+      return request(app)
+        .patch("/api/comments/1")
+        .send(badVoteInc)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
+        });
+    });
+    it("returns a 400 and a psql error message when given a null for value", () => {
+      const badVoteInc = {
+        inc_votes: null,
+      };
+
+      return request(app)
+        .patch("/api/comments/1")
+        .send(badVoteInc)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Fields cannot be null values");
         });
     });
   });
