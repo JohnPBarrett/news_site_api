@@ -117,6 +117,16 @@ exports.updateArticle = async (id, voteInc) => {
   }
 };
 
+exports.removeArticle = async (id) => {
+  const query = `DELETE FROM 
+                  articles
+                WHERE
+                  article_id = $1;`;
+
+  const result = await db.query(query, [id]);
+  return;
+};
+
 const sanitiseQuery = (query, params, validFields) => {
   const newParams = { ...params };
   const topic = [];

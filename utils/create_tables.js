@@ -39,7 +39,7 @@ const createCommentTable = async () => {
   const query = `CREATE TABLE comments (
                     comment_id SERIAL PRIMARY KEY,
                     author VARCHAR(30) REFERENCES users(username) NOT NULL,
-                    article_id INT REFERENCES articles(article_id) NOT NULL,
+                    article_id INT REFERENCES articles(article_id) ON DELETE CASCADE NOT NULL,
                     votes INT DEFAULT 0 NOT NULL,
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     body TEXT NOT NULL

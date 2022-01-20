@@ -205,6 +205,30 @@ describe("/api/articles/:articleId", () => {
         });
     });
   });
+  describe.only("DELETE", () => {
+    it("returns a 204 error and deletes the article and comments for articles", () => {
+      return request(app)
+        .delete("/api/articles/1")
+        .expect(204)
+        .then(() => {
+          const articleResult = db.query(
+            "SELECT * FROM articles WHERE article_id = 1"
+          );
+
+          return articleResult;
+        })
+        .then((articleResult) => {
+          expect(articleResult.rows.length).toBe(0);
+          const commentResult = db.query(
+            "SELECT * FROM comments WHERE article_id = 1"
+          );
+          return commentResult;
+        })
+        .then((commentResult) => {
+          expect(commentResult.rows.length).toBe(0);
+        });
+    });
+  });
 });
 
 describe("/api/articles", () => {

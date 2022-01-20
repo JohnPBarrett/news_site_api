@@ -2,6 +2,7 @@ const {
   selectArticle,
   insertArticle,
   updateArticle,
+  removeArticle,
   selectArticles,
   selectArticleComments,
   insertArticleComment,
@@ -16,22 +17,23 @@ exports.getArticles = async (req, res, next) => {
     next(err);
   }
 };
-exports.getArticle = async (req, res, next) => {
-  try {
-    const { articleId } = req.params;
-    const articleData = await selectArticle(articleId);
-
-    res.status(200).send(articleData);
-  } catch (err) {
-    next(err);
-  }
-};
 
 exports.postArticle = async (req, res, next) => {
   try {
     const article = await insertArticle(req.body);
 
     res.status(201).send(article);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getArticle = async (req, res, next) => {
+  try {
+    const { articleId } = req.params;
+    const articleData = await selectArticle(articleId);
+
+    res.status(200).send(articleData);
   } catch (err) {
     next(err);
   }
@@ -52,6 +54,16 @@ exports.patchArticle = async (req, res, next) => {
     const updatedArticle = await updateArticle(articleId, inc_votes);
 
     res.status(201).send(updatedArticle);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteArticle = async (req, res, next) => {
+  try {
+    const { articleId } = req.params;
+    await removeArticle(articleId);
+    res.sendStatus(204);
   } catch (err) {
     next(err);
   }
