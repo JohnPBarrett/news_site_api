@@ -57,7 +57,7 @@
   },
   "GET /api/articles/:articleId/comments": {
     "description": "Serves an array of all comments corresponding to articleId param",
-    "params": ["articleId"],
+    "params": ["articleId", "limit", "p"],
     "exampleResponse": [
       {
         "comment_id": 3,
