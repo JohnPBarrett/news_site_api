@@ -405,6 +405,49 @@ describe("/api/articles/:articleId/comments", () => {
           expect(body.message).toBe("Invalid input");
         });
     });
+    describe("Pagination", () => {
+      it("by default the endpoint will only return 10 results and does not have any offsets", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body);
+            expect(body.comments.length).toBe(10);
+          });
+      });
+      it("endpoint will return results specified by limit paramter ", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=3")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).toBe(3);
+          });
+      });
+      it("endpoint will offset results specified by p parameter", () => {
+        return request(app)
+          .get("/api/articles/1/comments?p=2&limit=10")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).toBe(1);
+          });
+      });
+      it("endpoint will give default limit value if limit has an incorrect data type", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=grapefruit")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).toBe(10);
+          });
+      });
+      it("endpoint will give first page if offset value has an incorrect data type", () => {
+        return request(app)
+          .get("/api/articles/1/comments?p=berry&limit=11")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).toBe(11);
+          });
+      });
+    });
   });
   describe("POST", () => {
     it("returns a 201 status and the newly created comment", () => {

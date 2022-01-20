@@ -110,18 +110,7 @@ const sanitiseQuery = (query, params, validFields) => {
     throw "Invalid order field";
   }
 
-  // sanitise for limit and page params
-  if (newParams.limit && newParams.limit > 0) {
-    limit = newParams.limit;
-  } else {
-    limit = 10;
-  }
-
-  if (newParams.p && newParams.p > 0) {
-    offset = (newParams.p - 1) * limit;
-  } else {
-    offset = 0;
-  }
+  [limit, offset] = santiseLimitAndOffset(newParams.limit, newParams.p);
 
   if (params.topic) {
     topic.push(params.topic);
@@ -135,8 +124,27 @@ const sanitiseQuery = (query, params, validFields) => {
   return [query, topic];
 };
 
-exports.selectArticleComments = async (id) => {
-  const query = `SELECT
+const santiseLimitAndOffset = (queryLimit, queryOffset) => {
+  let limit;
+  let offset;
+
+  // sanitise for limit and page params
+  if (queryLimit && queryLimit > 0) {
+    limit = queryLimit;
+  } else {
+    limit = 10;
+  }
+
+  if (queryOffset && queryOffset > 0) {
+    offset = (queryOffset - 1) * limit;
+  } else {
+    offset = 0;
+  }
+  return [limit, offset];
+};
+
+exports.selectArticleComments = async (id, params) => {
+  let query = `SELECT
                   articles.article_id,
                   comments.comment_id,
                   comments.votes,
@@ -150,7 +158,11 @@ exports.selectArticleComments = async (id) => {
                 USING 
                   (article_id)
                 WHERE
-                  articles.article_id = $1;`;
+                  articles.article_id = $1`;
+  const newParams = { ...params };
+  let [limit, offset] = santiseLimitAndOffset(newParams.limit, newParams.p);
+
+  query += ` LIMIT ${limit} OFFSET ${offset};`;
 
   const result = await db.query(query, [id]);
 
