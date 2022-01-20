@@ -49,7 +49,7 @@ exports.selectArticle = async (id) => {
                     topic, 
                     articles.created_at, 
                     articles.votes, 
-                    CAST(comment_count AS int) 
+                    COALESCE(CAST(comment_count AS int), 0) AS comment_count 
                   FROM 
                     articles 
                   LEFT JOIN 
