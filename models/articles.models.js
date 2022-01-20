@@ -72,6 +72,26 @@ exports.selectArticle = async (id) => {
   }
 };
 
+exports.insertArticle = async (queryBody) => {
+  let query = `INSERT INTO 
+                articles(author, title, body, topic)
+              VALUES
+                ($1, $2, $3, $4)
+              RETURNING *`;
+
+  const result = await db.query(query, [
+    queryBody.author,
+    queryBody.title,
+    queryBody.body,
+    queryBody.topic,
+  ]);
+
+  let newArticle = result.rows[0];
+  newArticle.comment_count = 0;
+
+  return newArticle;
+};
+
 exports.updateArticle = async (id, voteInc) => {
   const query = `UPDATE 
                     articles

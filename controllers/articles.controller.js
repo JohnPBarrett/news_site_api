@@ -1,5 +1,6 @@
 const {
   selectArticle,
+  insertArticle,
   updateArticle,
   selectArticles,
   selectArticleComments,
@@ -21,6 +22,16 @@ exports.getArticle = async (req, res, next) => {
     const articleData = await selectArticle(articleId);
 
     res.status(200).send(articleData);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.postArticle = async (req, res, next) => {
+  try {
+    const article = await insertArticle(req.body);
+
+    res.status(201).send(article);
   } catch (err) {
     next(err);
   }

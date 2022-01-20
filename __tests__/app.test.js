@@ -356,6 +356,33 @@ describe("/api/articles", () => {
         });
     });
   });
+  describe("POST", () => {
+    it("returns a status of 201 and a new article when receiving a valid article body", () => {
+      const newArticle = {
+        author: "icellusedkars",
+        title: "Posting is fun!",
+        body: "Posting is the new getting! By posting you create new....",
+        topic: "cats",
+      };
+
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            author: "icellusedkars",
+            title: "Posting is fun!",
+            body: "Posting is the new getting! By posting you create new....",
+            topic: "cats",
+            article_id: 13,
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: 0,
+          });
+        });
+    });
+  });
 });
 
 describe("/api/articles/:articleId/comments", () => {
