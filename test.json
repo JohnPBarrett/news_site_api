@@ -1,0 +1,147 @@
+{
+  "GET /api": {
+    "description": "serves up a json representation of all the available endpoints of the api"
+  },
+  "GET /api/topics": {
+    "description": "serves an array of all topics",
+    "queries": [],
+    "exampleResponse": {
+      "topics": [{ "slug": "football", "description": "Footie!" }]
+    }
+  },
+  "POST /api/topics": {
+    "description": "adds a new topic then serves newly created topic object",
+    "queries": [],
+    "exampleRequestBody": { "slug": "dogs", "description": "dogs are awesome" },
+    "exampleResponse": { "slug": "dogs", "description": "dogs are awesome" }
+  },
+  "GET /api/articles": {
+    "description": "serves an array of all topics",
+    "queries": ["topic", "sort_by", "order", "limit", "p"],
+    "exampleResponse": {
+      "articles": [
+        {
+          "author": "weegembump",
+          "title": "Seafood substitutions are increasing",
+          "article_id": 12,
+          "topic": "cooking",
+          "created_at": "2020-04-06T13:17:00.000Z",
+          "votes": 12,
+          "comment_count": 2,
+          "total_count": 3
+        }
+      ]
+    }
+  },
+  "POST /api/articles": {
+    "description": "adds a new article then serves newly created article object",
+    "queries": [],
+    "exampleRequestBody": {
+      "author": "icellusedkars",
+      "title": "Posting is fun!",
+      "body": "Posting is the new getting! By posting you create new....",
+      "topic": "cats"
+    },
+    "exampleResponse": {
+      "author": "icellusedkars",
+      "title": "Posting is fun!",
+      "body": "Posting is the new getting! By posting you create new....",
+      "topic": "cats",
+      "article_id": 13,
+      "votes": 0,
+      "created_at": "1234359833",
+      "comment_count": 0
+    }
+  },
+  "GET /api/articles/:articleId": {
+    "description": "serves a single article object corresponding to articleId param",
+    "params": ["articleId"],
+    "exampleResponse": {
+      "author": "butter_bridge",
+      "title": "Living in the shadow of a great man",
+      "article_id": 1,
+      "body": "I find this existence challenging",
+      "topic": "mitch",
+      "created_at": "2020-07-09T21:11:00.000Z",
+      "votes": 100,
+      "comment_count": 11
+    }
+  },
+  "PATCH /api/articles/:articleId": {
+    "description": "updates votes on article corresponding to inc_votes value and serves newly update article with 201 status",
+    "params": ["articleId"],
+    "exampleRequestBody": { "inc_votes": 2 },
+    "exampleResponse": {
+      "author": "butter_bridge",
+      "title": "Living in the shadow of a great man",
+      "article_id": 1,
+      "body": "I find this existence challenging",
+      "topic": "mitch",
+      "created_at": "2020-07-09T21:11:00.000Z",
+      "votes": 110
+    }
+  },
+  "DELETE /api/articles/:articleId": {
+    "description": "delete article and associated comments corresponding to articleId. Responds with 204 status",
+    "params": ["articleId"]
+  },
+  "GET /api/articles/:articleId/comments": {
+    "description": "Serves an array of all comments corresponding to articleId param",
+    "params": ["articleId", "limit", "p"],
+    "exampleResponse": [
+      {
+        "comment_id": 3,
+        "votes": 3,
+        "created_at": "2020-04-06T13:17:00.000Z",
+        "author": "icellusedkars",
+        "body": "beautiful thing about treasure is that it exists."
+      }
+    ]
+  },
+  "POST /api/articles/:articleId/comments": {
+    "description": "adds a new comment to article corresponding to articleId param then serves newly created comment",
+    "params": ["articleId"],
+    "exampleRequestBody": { "username": "flash", "body": "fastest man alive!" },
+    "exampleResponse": {
+      "comment_id": 7,
+      "author": "flash",
+      "article_id": 9,
+      "votes": 0,
+      "created_at": "2020-04-06T13:17:00.000Z",
+      "body": "fastest man alive!"
+    }
+  },
+  "DELETE /api/comments/:commentId": {
+    "description": "deletes comment corresponding to commentId param and returns a 204 status",
+    "params": ["commentId"]
+  },
+  "PATCH /api/comments/:commentId": {
+    "description": "updates votes on comment corresponding to inc_votes value and serves newly update comment with 201 status",
+    "params": ["commentId"],
+    "exampleRequestBody": { "inc_votes": 3 },
+    "exampleResponse": {
+      "comment_id": 1,
+      "author": "butter_bridge",
+      "article_id": 9,
+      "votes": 18,
+      "created_at": "2020-04-06T13:17:00.000Z",
+      "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+    }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users from db",
+    "queries": [],
+    "exampleResponse": {
+      "users": [{ "username": "Homer" }, { "username": "Bart" }]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "returns userObject when supplied with valid username",
+    "params": ["username"],
+    "exampleResponse": {
+      "username": "Batman",
+      "avatar_url": "Bat_signal.jpg",
+      "name": "Not_Bruce_Wayne"
+    }
+  }
+}
