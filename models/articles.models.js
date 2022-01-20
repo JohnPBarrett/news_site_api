@@ -121,10 +121,16 @@ exports.removeArticle = async (id) => {
   const query = `DELETE FROM 
                   articles
                 WHERE
-                  article_id = $1;`;
+                  article_id = $1
+                RETURNING *;`;
 
   const result = await db.query(query, [id]);
-  return;
+
+  if (result.rows.length > 0) {
+    return;
+  } else {
+    return Promise.reject({ status: 400, message: "Article does not exist" });
+  }
 };
 
 const sanitiseQuery = (query, params, validFields) => {

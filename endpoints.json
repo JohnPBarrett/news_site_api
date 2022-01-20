@@ -87,6 +87,10 @@
       "votes": 110
     }
   },
+  "DELETE /api/articles/:articleId": {
+    "description": "delete article and associated comments corresponding to articleId. Responds with 204 status",
+    "params": ["articleId"]
+  },
   "GET /api/articles/:articleId/comments": {
     "description": "Serves an array of all comments corresponding to articleId param",
     "params": ["articleId", "limit", "p"],

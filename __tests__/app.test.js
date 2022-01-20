@@ -205,14 +205,15 @@ describe("/api/articles/:articleId", () => {
         });
     });
   });
-  describe.only("DELETE", () => {
-    it("returns a 204 error and deletes the article and comments for articles", () => {
+  describe("DELETE", () => {
+    it("returns a 204 error and deletes the article and comments for article specified articleId", () => {
       return request(app)
         .delete("/api/articles/1")
         .expect(204)
-        .then(() => {
+        .then((response) => {
+          expect(response.body).toEqual({});
           const articleResult = db.query(
-            "SELECT * FROM articles WHERE article_id = 1"
+            "SELECT * FROM articles WHERE article_id = 1;"
           );
 
           return articleResult;
@@ -220,12 +221,28 @@ describe("/api/articles/:articleId", () => {
         .then((articleResult) => {
           expect(articleResult.rows.length).toBe(0);
           const commentResult = db.query(
-            "SELECT * FROM comments WHERE article_id = 1"
+            "SELECT * FROM comments WHERE article_id = 1;"
           );
           return commentResult;
         })
         .then((commentResult) => {
           expect(commentResult.rows.length).toBe(0);
+        });
+    });
+    it("returns a 400 error when using wrong data type for articleId parameter", () => {
+      return request(app)
+        .delete("/api/articles/orange")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
+        });
+    });
+    it("returns a 400 error when trying to delete an article that does not exists", () => {
+      return request(app)
+        .delete("/api/articles/999999")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Article does not exist");
         });
     });
   });
