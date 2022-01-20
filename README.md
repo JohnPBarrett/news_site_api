@@ -29,14 +29,14 @@ You then need to have the following line within the file: **PGDATABASE=nc_news**
 
     npm run dev
     
-This will populate the nc_news database and run the app. By default, this app runs on port 9090 but can. be changed in `listen.js` 
+This will populate the nc_news database and run the app. By default, this app runs on port 9090 but can be changed in `listen.js` 
     
 ## Run the tests 
 
 To run the tests you will need to create a `.env.test` file in the root directory of project. 
 
-You then need to have the following line within the file: **PGDATABASE=nc_news_test**. Then you just need to run the following command: 
+You then need to have the following line within the file: **PGDATABASE=nc_news_test**. Afterwards, you need to run the following command: 
 
     npm run test
     
-This populate the test database before each test
+This will populate the test database before each test
