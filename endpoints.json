@@ -27,6 +27,26 @@
       ]
     }
   },
+  "POST /api/articles": {
+    "description": "adds a new article then serves newly created article object",
+    "queries": [],
+    "exampleRequestBody": {
+      "author": "icellusedkars",
+      "title": "Posting is fun!",
+      "body": "Posting is the new getting! By posting you create new....",
+      "topic": "cats"
+    },
+    "exampleResponse": {
+      "author": "icellusedkars",
+      "title": "Posting is fun!",
+      "body": "Posting is the new getting! By posting you create new....",
+      "topic": "cats",
+      "article_id": 13,
+      "votes": 0,
+      "created_at": "1234359833",
+      "comment_count": 0
+    }
+  },
   "GET /api/articles/:articleId": {
     "description": "serves a single article object corresponding to articleId param",
     "params": ["articleId"],
@@ -71,13 +91,14 @@
   "POST /api/articles/:articleId/comments": {
     "description": "adds a new comment to article corresponding to articleId param then serves newly created comment",
     "params": ["articleId"],
+    "exampleRequestBody": { "username": "flash", "body": "fastest man alive!" },
     "exampleResponse": {
       "comment_id": 7,
-      "author": "icellusedkars",
+      "author": "flash",
       "article_id": 9,
       "votes": 0,
       "created_at": "2020-04-06T13:17:00.000Z",
-      "body": "beautiful thing about treasure is that it exists."
+      "body": "fastest man alive!"
     }
   },
   "DELETE /api/comments/:commentId": {

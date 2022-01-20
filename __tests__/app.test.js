@@ -382,6 +382,71 @@ describe("/api/articles", () => {
           });
         });
     });
+    it("returns a status of 400 and an error message when receiving an article body with an invalid key", () => {
+      const badArticleBody = {
+        fakekey: "evil",
+        author: "icellusedkars",
+        title: "Posting is fun!",
+        body: "Posting is the new getting! By posting you create new....",
+        topic: "cats",
+      };
+
+      return request(app)
+        .post("/api/articles")
+        .send(badArticleBody)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid field body");
+        });
+    });
+    it("returns a status of 400 and an error message when receiving an author value that does not exist", () => {
+      const badArticleBody = {
+        author: "JK Rowling",
+        title: "Posting is fun!",
+        body: "Posting is the new getting! By posting you create new....",
+        topic: "cats",
+      };
+
+      return request(app)
+        .post("/api/articles")
+        .send(badArticleBody)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Value/s violate foreign key restraint");
+        });
+    });
+    it("returns a status of 400 and an error message when receiving an author value that does not exist", () => {
+      const badArticleBody = {
+        author: "icellusedkars",
+        title: "Posting is fun!",
+        body: "Posting is the new getting! By posting you create new....",
+        topic: "dogs",
+      };
+
+      return request(app)
+        .post("/api/articles")
+        .send(badArticleBody)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Value/s violate foreign key restraint");
+        });
+    });
+    it("returns a status of 400 and an error message when receiving null values in body", () => {
+      const badArticleBody = {
+        author: "icellusedkars",
+        title: "Posting is fun!",
+        body: null,
+        topic: "dogs",
+      };
+
+      return request(app)
+        .post("/api/articles")
+        .send(badArticleBody)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Fields cannot be null values");
+        });
+    });
   });
 });
 

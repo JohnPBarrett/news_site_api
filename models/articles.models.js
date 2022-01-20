@@ -78,6 +78,13 @@ exports.insertArticle = async (queryBody) => {
               VALUES
                 ($1, $2, $3, $4)
               RETURNING *`;
+  const validFields = ["author", "title", "body", "topic"];
+
+  for (let key in queryBody) {
+    if (!validFields.includes(key)) {
+      throw "Invalid field body";
+    }
+  }
 
   const result = await db.query(query, [
     queryBody.author,
