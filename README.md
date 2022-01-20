@@ -16,9 +16,24 @@ The entire api is written in JavaScript using node.js & express.
 
 ## Dependencies 
 
-### Prequisitse
+### Prerequisites
 
+* node 17.x
+* npm 8.x
 
+### Dependencies
+
+* dotenv 14.x
+* express 4.x
+* nodemon 2.x
+* pg 8.x
+* pg-format 1.x
+
+### Dev Dependencies
+
+* jest 27.x
+* jest-sorted 1.x
+* supertest 6.x
 
 ## Cloning
 
@@ -31,18 +46,20 @@ The entire api is written in JavaScript using node.js & express.
 To create the default databases run the following script: 
 
     npm run setup-dbs
+    
+This will create the databases in the ./db/setup.sql file
    
 ## Run the app   
 
 You need to create a `.env.development` file in the root directory of project. 
 
-You then need to have the following line within the file: **PGDATABASE=<database_name_here>**. Then you just need to run the following command: 
+You then need to have the following line within the file: **PGDATABASE=<database_name_here>**. Afterwards, run the following command: 
 
     npm run dev
     
 This will populate the database and run the app. By default, this app runs on port 9090 but can be changed in `listen.js` 
 
-If however you only want to populate the databases without running the app then use the following command:
+If, however, you only want to populate the databases without running the app then use the following command:
 
     npm run seed
     
