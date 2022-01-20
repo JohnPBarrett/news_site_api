@@ -1,10 +1,20 @@
-const { selectTopics } = require("../models/topics.models.js");
+const { selectTopics, insertTopic } = require("../models/topics.models.js");
 
-exports.getTopics = (req, res, next) => {
+exports.getTopics = async (req, res, next) => {
   try {
-    selectTopics().then(({ rows }) => {
-      res.status(200).send({ topics: rows });
-    });
+    const topics = await selectTopics();
+
+    res.status(200).send({ topics });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.postTopic = async (req, res, next) => {
+  try {
+    const topic = await insertTopic(req.body);
+
+    res.status(201).send(topic);
   } catch (err) {
     next(err);
   }

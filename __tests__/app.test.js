@@ -45,6 +45,50 @@ describe("/api/topics", () => {
         .catch((err) => console.log(err));
     });
   });
+  describe("POST", () => {
+    it("returns a 201 response and the newly created topic when receiving a valid topic object", () => {
+      const topic = {
+        slug: "dogs",
+        description: "dogs are awesome",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(topic)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            slug: "dogs",
+            description: "dogs are awesome",
+          });
+        });
+    });
+    it("returns a 400 and error message when receiving an invalid field", () => {
+      const badTopic = {
+        snail: "dogs",
+        description: "dogs are awesome",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(badTopic)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid field body");
+        });
+    });
+    it("returns a 400 and error message when receiving a null value", () => {
+      const badTopic = {
+        slug: null,
+        description: "dogs are awesome",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(badTopic)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Fields cannot be null values");
+        });
+    });
+  });
 });
 
 describe("/api/articles/:articleId", () => {
