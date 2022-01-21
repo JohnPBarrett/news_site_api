@@ -27,7 +27,7 @@ describe("/api/topics", () => {
         .get("/api/topics")
         .expect(200)
         .then(({ body }) => {
-          expect(Array.isArray(body.topics)).toBe(false);
+          expect(Array.isArray(body.topics)).toBe(true);
           body.topics.forEach((topic) => {
             expect(topic).toEqual(
               expect.objectContaining({
