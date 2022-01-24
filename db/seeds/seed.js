@@ -7,17 +7,13 @@ const seed = async (data) => {
 
   try {
     await createTables();
-    console.log("Tables successfully created");
   } catch (err) {
-    console.error("error in creating tables", err);
     throw err;
   }
   // 2. insert data
   try {
     await insertTableData(topicData, userData, articleData, commentData);
-    console.log("Database successfully seeded");
   } catch (err) {
-    console.error("error in inserting data", err);
     throw err;
   }
 };

@@ -38,6 +38,7 @@ describe("/api/topics", () => {
           });
         });
     });
+
     it("returns a 404 and a message when path is incorrect", () => {
       return request(app)
         .get("/api/topic")
@@ -99,14 +100,16 @@ describe("/api/articles/:articleId", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
-            author: "butter_bridge",
-            title: "Living in the shadow of a great man",
-            article_id: 1,
-            body: "I find this existence challenging",
-            topic: "mitch",
-            created_at: "2020-07-09T21:11:00.000Z",
-            votes: 100,
-            comment_count: 11,
+            article: {
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              body: "I find this existence challenging",
+              topic: "mitch",
+              created_at: "2020-07-09T21:11:00.000Z",
+              votes: 100,
+              comment_count: 11,
+            },
           });
         });
     });
@@ -116,14 +119,16 @@ describe("/api/articles/:articleId", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
-            author: "icellusedkars",
-            title: "Sony Vaio; or, The Laptop",
-            article_id: 2,
-            body: "Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.",
-            topic: "mitch",
-            created_at: "2020-10-16T06:03:00.000Z",
-            votes: 0,
-            comment_count: 0,
+            article: {
+              author: "icellusedkars",
+              title: "Sony Vaio; or, The Laptop",
+              article_id: 2,
+              body: "Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.",
+              topic: "mitch",
+              created_at: "2020-10-16T06:03:00.000Z",
+              votes: 0,
+              comment_count: 0,
+            },
           });
         });
     });
@@ -150,16 +155,18 @@ describe("/api/articles/:articleId", () => {
       return request(app)
         .patch("/api/articles/1")
         .send(voteInc)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
-            author: "butter_bridge",
-            title: "Living in the shadow of a great man",
-            article_id: 1,
-            body: "I find this existence challenging",
-            topic: "mitch",
-            created_at: "2020-07-09T21:11:00.000Z",
-            votes: 110,
+            article: {
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              body: "I find this existence challenging",
+              topic: "mitch",
+              created_at: "2020-07-09T21:11:00.000Z",
+              votes: 110,
+            },
           });
         });
     });
@@ -168,16 +175,18 @@ describe("/api/articles/:articleId", () => {
       return request(app)
         .patch("/api/articles/1")
         .send(voteInc)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
-            author: "butter_bridge",
-            title: "Living in the shadow of a great man",
-            article_id: 1,
-            body: "I find this existence challenging",
-            topic: "mitch",
-            created_at: "2020-07-09T21:11:00.000Z",
-            votes: -50,
+            article: {
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              body: "I find this existence challenging",
+              topic: "mitch",
+              created_at: "2020-07-09T21:11:00.000Z",
+              votes: -50,
+            },
           });
         });
     });
@@ -425,12 +434,21 @@ describe("/api/articles", () => {
             });
           });
       });
-      it("function returns a 400 response and an error message when providing invalid topic value", () => {
+      it("function returns a 200 response and an empty array when provided with a valid topic that has no linked articles", () => {
+        return request(app)
+          .get("/api/articles?topic=paper")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(0);
+            expect(body.articles).toEqual([]);
+          });
+      });
+      it("function returns a 404 response and an error message when providing invalid topic value", () => {
         return request(app)
           .get("/api/articles?topic=milk")
-          .expect(400)
+          .expect(404)
           .then(({ body }) => {
-            expect(body.message).toBe("Invalid topic value");
+            expect(body.message).toBe("Topic not found");
           });
       });
       it("total_count parameter will change depending on filtered topic", () => {
@@ -605,7 +623,6 @@ describe("/api/articles/:articleId/comments", () => {
           .get("/api/articles/1/comments")
           .expect(200)
           .then(({ body }) => {
-            console.log(body);
             expect(body.comments.length).toBe(10);
           });
       });

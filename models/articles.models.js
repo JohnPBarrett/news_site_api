@@ -36,7 +36,16 @@ exports.selectArticles = async (params) => {
   if (result.rows.length > 0) {
     return result.rows;
   } else {
-    return Promise.reject({ status: 400, message: "Invalid topic value" });
+    const dbOutput = await db.query(
+      `SELECT * FROM topics WHERE slug = $1;`,
+      topic
+    );
+
+    if (dbOutput.rows.length === 0) {
+      return Promise.reject({ status: 404, message: "Topic not found" });
+    } else {
+      return [];
+    }
   }
 };
 

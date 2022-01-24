@@ -20,7 +20,6 @@ exports.handlePsqlErrors = (err, req, res, next) => {
   } else if (err.code === "23502") {
     res.status(400).send({ message: "Fields cannot be null values" });
   } else if (err.code === "23503") {
-    console.error(err);
     res.status(400).send({ message: "Value/s violate foreign key restraint" });
   } else {
     next(err);
@@ -28,7 +27,6 @@ exports.handlePsqlErrors = (err, req, res, next) => {
 };
 
 exports.handleServerErrors = (err, req, res, next) => {
-  console.error(err);
   res.status(500).send({ message: "Internal server error" });
 };
 
