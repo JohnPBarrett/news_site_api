@@ -39,18 +39,10 @@ exports.getArticle = async (req, res, next) => {
 };
 
 exports.patchArticle = async (req, res, next) => {
-  const validBodyFields = ["inc_votes"];
-
   try {
-    for (let key in req.body) {
-      // To handle case where body has invalid fields
-      if (!validBodyFields.includes(key)) {
-        throw "Invalid field body";
-      }
-    }
     const { articleId } = req.params;
-    const { inc_votes } = req.body;
-    const article = await updateArticle(articleId, inc_votes);
+
+    const article = await updateArticle(articleId, req.body);
 
     res.status(200).send({ article });
   } catch (err) {
@@ -83,8 +75,8 @@ exports.postArticleComment = async (req, res, next) => {
   const { articleId } = req.params;
 
   try {
-    const newComment = await insertArticleComment(articleId, req.body);
-    res.status(201).send(newComment);
+    const comment = await insertArticleComment(articleId, req.body);
+    res.status(201).send({ comment });
   } catch (err) {
     next(err);
   }

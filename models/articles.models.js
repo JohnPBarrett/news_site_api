@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkExists, checkExistsPost } = require("../utils/checkExists");
 
 exports.selectArticles = async (params) => {
   let query = `   SELECT 
@@ -36,16 +37,7 @@ exports.selectArticles = async (params) => {
   if (result.rows.length > 0) {
     return result.rows;
   } else {
-    const dbOutput = await db.query(
-      `SELECT * FROM topics WHERE slug = $1;`,
-      topic
-    );
-
-    if (dbOutput.rows.length === 0) {
-      return Promise.reject({ status: 404, message: "Topic not found" });
-    } else {
-      return [];
-    }
+    return await checkExists("topics", "slug", topic[0]);
   }
 };
 
@@ -77,7 +69,7 @@ exports.selectArticle = async (id) => {
   if (result.rows.length > 0) {
     return result.rows[0];
   } else {
-    return Promise.reject({ status: 400, message: "Article does not exist" });
+    return await checkExists("articles", "article_id", id);
   }
 };
 
@@ -116,13 +108,25 @@ exports.updateArticle = async (id, voteInc) => {
                   WHERE
                     article_id = $1
                   RETURNING *;`;
+  const validBodyFields = ["inc_votes"];
 
-  const result = await db.query(query, [id, voteInc]);
+  for (let key in voteInc) {
+    // To handle case where body has invalid fields
+    if (!validBodyFields.includes(key)) {
+      throw "Invalid field body";
+    }
+  }
+
+  if (Object.keys(voteInc).length === 0) {
+    voteInc = { inc_votes: 0 };
+  }
+
+  const result = await db.query(query, [id, voteInc.inc_votes]);
 
   if (result.rows.length > 0) {
     return result.rows[0];
   } else {
-    return Promise.reject({ status: 400, message: "Article does not exist" });
+    return await checkExists("articles", "article_id", id);
   }
 };
 
@@ -226,7 +230,7 @@ exports.selectArticleComments = async (id, params) => {
       return result.rows;
     }
   } else {
-    return Promise.reject({ status: 400, message: "Article does not exist" });
+    return await checkExists("articles", "article_id", id);
   }
 };
 
@@ -242,6 +246,23 @@ exports.insertArticleComment = async (id, queryBody) => {
     if (!validFields.includes(key)) {
       throw "Invalid field body";
     }
+  }
+
+  const checkArticleExists = await checkExistsPost(
+    "articles",
+    "article_id",
+    id
+  );
+
+  const checkUserExists = await checkExistsPost(
+    "users",
+    "username",
+    queryBody.username
+  );
+
+  if (checkArticleExists !== "exists" || checkUserExists !== "exists") {
+    // The same error message exists on checkUserExists variable
+    return checkArticleExists;
   }
 
   const result = await db.query(query, [

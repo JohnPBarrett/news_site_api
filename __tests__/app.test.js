@@ -132,12 +132,12 @@ describe("/api/articles/:articleId", () => {
           });
         });
     });
-    it("returns with 400 status and sends back message when trying to access an article that does not exist", () => {
+    it("returns with 404 status and sends back message when trying to access an article that does not exist", () => {
       return request(app)
         .get("/api/articles/99999")
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("Article does not exist");
+          expect(body.message).toBe("Resource not found");
         });
     });
     it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
@@ -150,7 +150,7 @@ describe("/api/articles/:articleId", () => {
     });
   });
   describe("PATCH", () => {
-    it("Returns a 201 status and the updated article when receiving positive vote", () => {
+    it("Returns a 200 status and the updated article when receiving positive vote", () => {
       const voteInc = { inc_votes: 10 };
       return request(app)
         .patch("/api/articles/1")
@@ -170,7 +170,7 @@ describe("/api/articles/:articleId", () => {
           });
         });
     });
-    it("Returns a 201 status and the updated article when receiving negative vote", () => {
+    it("Returns a 200 status and the updated article when receiving negative vote", () => {
       const voteInc = { inc_votes: -150 };
       return request(app)
         .patch("/api/articles/1")
@@ -190,14 +190,35 @@ describe("/api/articles/:articleId", () => {
           });
         });
     });
-    it("returns with 400 status and sends back message when trying to update an article that does not exist", () => {
+    it("Returns a 200 status and the unchanged article when receiving an empty body", () => {
+      const emptyBody = {};
+      return request(app)
+        .patch("/api/articles/1")
+        .send(emptyBody)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            article: {
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              body: "I find this existence challenging",
+              topic: "mitch",
+              created_at: "2020-07-09T21:11:00.000Z",
+              votes: 100,
+            },
+          });
+        });
+    });
+
+    it("returns with 404 status and sends back message when trying to update an article that does not exist", () => {
       const vote = { inc_votes: 40 };
       return request(app)
         .patch("/api/articles/99999")
         .send(vote)
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("Article does not exist");
+          expect(body.message).toBe("Resource not found");
         });
     });
     it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
@@ -448,7 +469,7 @@ describe("/api/articles", () => {
           .get("/api/articles?topic=milk")
           .expect(404)
           .then(({ body }) => {
-            expect(body.message).toBe("Topic not found");
+            expect(body.message).toBe("Resource not found");
           });
       });
       it("total_count parameter will change depending on filtered topic", () => {
@@ -601,12 +622,12 @@ describe("/api/articles/:articleId/comments", () => {
           expect(body.comments.length === 0).toBe(true);
         });
     });
-    it("returns with 400 status and sends back message when trying to access comments on an article that does not exist", () => {
+    it("returns with 404 status and sends back message when trying to access comments on an article that does not exist", () => {
       return request(app)
         .get("/api/articles/99999/comments")
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("Article does not exist");
+          expect(body.message).toBe("Resource not found");
         });
     });
     it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
@@ -673,17 +694,19 @@ describe("/api/articles/:articleId/comments", () => {
         .then(({ body }) => {
           expect(body).toEqual(
             expect.objectContaining({
-              comment_id: expect.any(Number),
-              author: newComment.username,
-              article_id: 1,
-              votes: 0,
-              created_at: expect.any(String),
-              body: newComment.body,
+              comment: {
+                comment_id: expect.any(Number),
+                author: newComment.username,
+                article_id: 1,
+                votes: 0,
+                created_at: expect.any(String),
+                body: newComment.body,
+              },
             })
           );
         });
     });
-    it("returns a 400 status when sending a body that has a key that is invalid", () => {
+    it("returns a 400 status when sending a body that contains a key that is invalid", () => {
       const badComment = {
         user: "icellusedkars",
         body: "This is a test",
@@ -697,18 +720,18 @@ describe("/api/articles/:articleId/comments", () => {
           expect(body.message).toBe("Invalid field body");
         });
     });
-    it("returns a 400 status when sending a post request to an article that does not exist", () => {
+    it("returns a 404 status when sending a post request to an article that does not exist but has a valid article id", () => {
       const comment = {
         username: "icellusedkars",
         body: "This is a test",
       };
 
       return request(app)
-        .post("/api/articles/12345678/comments")
+        .post("/api/articles/1234/comments")
         .send(comment)
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("Value/s violate foreign key restraint");
+          expect(body.message).toBe("Resource not found");
         });
     });
     it("returns a 400 status when sending a post request with a null value", () => {
@@ -725,7 +748,7 @@ describe("/api/articles/:articleId/comments", () => {
           expect(body.message).toBe("Fields cannot be null values");
         });
     });
-    it("returns a 400 status when sending a post request with a username that does not exist", () => {
+    it("returns a 404 status when sending a post request with a username that does not exist", () => {
       const badComment = {
         username: "fakeName",
         body: "Something to write about",
@@ -734,9 +757,9 @@ describe("/api/articles/:articleId/comments", () => {
       return request(app)
         .post("/api/articles/1/comments")
         .send(badComment)
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("Value/s violate foreign key restraint");
+          expect(body.message).toBe("Resource not found");
         });
     });
     it("returns a 400 status when sending a post request with an invalid value for article_id", () => {
@@ -788,45 +811,69 @@ describe("/api/comments/:commentId", () => {
     });
   });
   describe("PATCH", () => {
-    it("returns a 201 and the comment with updated postive vote amount", () => {
+    it("returns a 200 and the comment with updated postive vote amount", () => {
       const voteInc = {
         inc_votes: 2,
       };
       return request(app)
         .patch("/api/comments/1")
         .send(voteInc)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
-            comment_id: 1,
-            author: "butter_bridge",
-            article_id: 9,
-            votes: 18,
-            created_at: "2020-04-06T13:17:00.000Z",
-            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            comment: {
+              comment_id: 1,
+              author: "butter_bridge",
+              article_id: 9,
+              votes: 18,
+              created_at: "2020-04-06T13:17:00.000Z",
+              body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            },
           });
         });
     });
-    it("returns a 201 and the comment with updated negative vote amount", () => {
+    it("returns a 200 and the comment with updated negative vote amount", () => {
       const voteInc = {
         inc_votes: -6,
       };
       return request(app)
         .patch("/api/comments/1")
         .send(voteInc)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
-            comment_id: 1,
-            author: "butter_bridge",
-            article_id: 9,
-            votes: 10,
-            created_at: "2020-04-06T13:17:00.000Z",
-            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            comment: {
+              comment_id: 1,
+              author: "butter_bridge",
+              article_id: 9,
+              votes: 10,
+              created_at: "2020-04-06T13:17:00.000Z",
+              body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            },
           });
         });
     });
-    it("returns a 400 and a message when given a commentId that does not exist", () => {
+
+    it("returns a 200 and the comment when a blank body has been received", () => {
+      const voteInc = {};
+      return request(app)
+        .patch("/api/comments/1")
+        .send(voteInc)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            comment: {
+              comment_id: 1,
+              author: "butter_bridge",
+              article_id: 9,
+              votes: 16,
+              created_at: "2020-04-06T13:17:00.000Z",
+              body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            },
+          });
+        });
+    });
+    it("returns a 404 and a message when given a commentId that does not exist", () => {
       const voteInc = {
         inc_votes: -6,
       };
@@ -834,9 +881,9 @@ describe("/api/comments/:commentId", () => {
       return request(app)
         .patch("/api/comments/123578")
         .send(voteInc)
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("Comment does not exist");
+          expect(body.message).toBe("Resource not found");
         });
     });
     it("returns a 400 and a message when given a commentId that has the incorrect data type", () => {
@@ -878,14 +925,14 @@ describe("/api/comments/:commentId", () => {
           expect(body.message).toBe("Invalid input");
         });
     });
-    it("returns a 400 and a psql error message when given a null for value", () => {
-      const badVoteInc = {
+    it("returns a 400 and a messaeg when inc_votes is null", () => {
+      const nullVoteInc = {
         inc_votes: null,
       };
 
       return request(app)
         .patch("/api/comments/1")
-        .send(badVoteInc)
+        .send(nullVoteInc)
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe("Fields cannot be null values");

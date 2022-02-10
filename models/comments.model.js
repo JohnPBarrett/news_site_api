@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkExists } = require("../utils/checkExists");
 
 exports.removeComment = async (id) => {
   const query = `DELETE FROM 
@@ -24,6 +25,10 @@ exports.updateComment = async (id, voteInc) => {
                   comment_id = $1
                 RETURNING *;`;
 
+  if (Object.keys(voteInc).length === 0) {
+    voteInc = { inc_votes: 0 };
+  }
+
   for (let key in voteInc) {
     if (key !== "inc_votes") {
       throw "Invalid field body";
@@ -35,6 +40,6 @@ exports.updateComment = async (id, voteInc) => {
   if (result.rows.length > 0) {
     return result.rows[0];
   } else {
-    return Promise.reject({ status: 400, message: "Comment does not exist" });
+    return await checkExists("comments", "comment_id", id);
   }
 };

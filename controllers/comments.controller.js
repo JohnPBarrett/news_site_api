@@ -16,7 +16,7 @@ exports.patchComment = async (req, res, next) => {
 
   try {
     const comment = await updateComment(comment_id, req.body);
-    res.status(201).send(comment);
+    res.status(200).send({ comment });
   } catch (err) {
     next(err);
   }
