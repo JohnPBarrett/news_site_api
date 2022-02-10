@@ -483,6 +483,38 @@ describe("/api/articles", () => {
           });
       });
     });
+    describe("Search", () => {
+      it("query returns a status of 200 and a selection of titles when given articles that contain a matched str", () => {
+        return request(app)
+          .get("/api/articles?search=pred")
+          .expect(200)
+          .then(({ body }) => {
+            body.articles.forEach((article) => {
+              expect(article).toEqual(
+                expect.objectContaining({
+                  author: expect.any(String),
+                  title: expect.stringContaining("pred"),
+                  article_id: expect.any(Number),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  comment_count: expect.any(Number),
+                  total_count: expect.any(Number),
+                })
+              );
+            });
+          });
+      });
+
+      it("query returns a status of 404 message when no topic has the contained string", () => {
+        return request(app)
+          .get("/api/articles?search=somewhereovertherainbow")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Resource not found");
+          });
+      });
+    });
     it("function can use all query params and sends back a 200 response with an array of articles", () => {
       return request(app)
         .get("/api/articles?sort_by=article_id&topic=mitch&order=asc")

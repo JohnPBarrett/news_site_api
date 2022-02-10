@@ -18,6 +18,8 @@ exports.selectArticles = async (params) => {
                     article_id) AS comments_table
                   ON
                     articles.article_id = comment_article_id
+                  WHERE
+                    1 = 1
                `;
   const validFields = [
     "author",
@@ -27,6 +29,7 @@ exports.selectArticles = async (params) => {
     "created_at",
     "votes",
     "comment_count",
+    "search",
   ];
   let topic;
 
@@ -148,7 +151,7 @@ exports.removeArticle = async (id) => {
 
 const sanitiseQuery = (query, params, validFields) => {
   const newParams = { ...params };
-  const topic = [];
+  const queryVals = [];
 
   const sortBy = newParams.sort_by || "created_at";
   let order = newParams.order || "DESC";
@@ -168,16 +171,23 @@ const sanitiseQuery = (query, params, validFields) => {
 
   [limit, offset] = santiseLimitAndOffset(newParams.limit, newParams.p);
 
-  if (params.topic) {
-    topic.push(params.topic);
-    query += `  WHERE topic = $1 `;
+  if (params.topic && params.search) {
+    queryVals.push(params.topic);
+    queryVals.push(`%${params.search}%`);
+    query += `  AND topic = $1 AND title LIKE $2 `;
+  } else if (params.topic) {
+    queryVals.push(params.topic);
+    query += `  AND topic = $1 `;
+  } else if (params.search) {
+    queryVals.push(`%${params.search}%`);
+    query += `  AND title LIKE $1 `;
   }
 
   query += ` ORDER BY ${sortBy} ${order}`;
 
   query += ` LIMIT ${limit} OFFSET ${offset};`;
 
-  return [query, topic];
+  return [query, queryVals];
 };
 
 const santiseLimitAndOffset = (queryLimit, queryOffset) => {
