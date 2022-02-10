@@ -174,13 +174,13 @@ const sanitiseQuery = (query, params, validFields) => {
   if (params.topic && params.search) {
     queryVals.push(params.topic);
     queryVals.push(`%${params.search}%`);
-    query += `  AND topic = $1 AND title LIKE $2 `;
+    query += `  AND topic = $1 AND title ILIKE $2 `;
   } else if (params.topic) {
     queryVals.push(params.topic);
     query += `  AND topic = $1 `;
   } else if (params.search) {
     queryVals.push(`%${params.search}%`);
-    query += `  AND title LIKE $1 `;
+    query += `  AND title ILIKE $1 `;
   }
 
   query += ` ORDER BY ${sortBy} ${order}`;
