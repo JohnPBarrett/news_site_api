@@ -224,7 +224,9 @@ exports.selectArticleComments = async (id, params) => {
                 USING 
                   (article_id)
                 WHERE
-                  articles.article_id = $1`;
+                  articles.article_id = $1
+                ORDER BY 
+                  comments.comment_id DESC `;
   const newParams = { ...params };
   let [limit, offset] = santiseLimitAndOffset(newParams.limit, newParams.p);
 
