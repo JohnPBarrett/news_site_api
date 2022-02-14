@@ -1,7 +1,8 @@
 const {
   selectArticle,
   insertArticle,
-  updateArticle,
+  updateArticleVotes,
+  updateArticleBody,
   removeArticle,
   selectArticles,
   selectArticleComments,
@@ -41,8 +42,14 @@ exports.getArticle = async (req, res, next) => {
 exports.patchArticle = async (req, res, next) => {
   try {
     const { articleId } = req.params;
+    let article;
 
-    const article = await updateArticle(articleId, req.body);
+    if ("body" in req.body) {
+      article = await updateArticleBody(articleId, req.body);
+    } else {
+      // The handler for null cases is present in updateArticleVotes
+      article = await updateArticleVotes(articleId, req.body);
+    }
 
     res.status(200).send({ article });
   } catch (err) {
