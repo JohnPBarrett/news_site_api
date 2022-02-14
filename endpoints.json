@@ -74,7 +74,7 @@
     }
   },
   "PATCH /api/articles/:articleId": {
-    "description": "updates votes on article corresponding to inc_votes value and serves newly update article with 201 status",
+    "description": "updates votes on article  or updates article body depending on request body. Value of 'inc_votes' will increase votes, value of 'body' will change the body to the requested value. The two are independant, you cannot change body and change votes on same request. Endpoint responds with a 200 status when successful.",
     "params": ["articleId"],
     "exampleRequestBody": { "inc_votes": 2 },
     "exampleResponse": {
@@ -122,7 +122,7 @@
     "params": ["commentId"]
   },
   "PATCH /api/comments/:commentId": {
-    "description": "updates votes on comment corresponding to inc_votes value and serves newly update comment with 201 status",
+    "description": "updates votes on comment  or updates comment body depending on request body. Value of 'inc_votes' will increase votes, value of 'body' will change the body to the requested value. The two are independant, you cannot change body and change votes on same request. Endpoint responds with a 200 status when successful.",
     "params": ["commentId"],
     "exampleRequestBody": { "inc_votes": 3 },
     "exampleResponse": {

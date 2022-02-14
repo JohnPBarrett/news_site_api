@@ -253,7 +253,7 @@ describe("/api/articles/:articleId", () => {
           });
       });
     });
-    describe.only("update body in an article", () => {
+    describe("update body in an article", () => {
       it("returns a 200 status and an article with an updated body when receiving valid body and id", () => {
         const articleBody = { body: "This is some test text!" };
         return request(app)
@@ -312,6 +312,16 @@ describe("/api/articles/:articleId", () => {
         return request(app)
           .patch("/api/articles/apple")
           .send(articleBody)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Invalid input");
+          });
+      });
+      it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
+        const commentBody = { body: "this is some text" };
+        return request(app)
+          .patch("/api/articles/grapes")
+          .send(commentBody)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid input");
@@ -456,7 +466,7 @@ describe("/api/articles", () => {
       });
     });
     describe("Pagination", () => {
-      it("by default the endpoint will only return 10 results and does not have any offsets", () => {
+      it("by default the endpoint will return 10 results and does not have any offsets", () => {
         return request(app)
           .get("/api/articles?sort_by=article_id&order=asc")
           .expect(200)
@@ -920,132 +930,182 @@ describe("/api/comments/:commentId", () => {
     });
   });
   describe("PATCH", () => {
-    it("returns a 200 and the comment with updated postive vote amount", () => {
-      const voteInc = {
-        inc_votes: 2,
-      };
-      return request(app)
-        .patch("/api/comments/1")
-        .send(voteInc)
-        .expect(200)
-        .then(({ body }) => {
-          expect(body).toEqual({
-            comment: {
-              comment_id: 1,
-              author: "butter_bridge",
-              article_id: 9,
-              votes: 18,
-              created_at: "2020-04-06T13:17:00.000Z",
-              body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-            },
+    describe("update votes on a comment", () => {
+      it("returns a 200 and the comment with updated postive vote amount", () => {
+        const voteInc = {
+          inc_votes: 2,
+        };
+        return request(app)
+          .patch("/api/comments/1")
+          .send(voteInc)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              comment: {
+                comment_id: 1,
+                author: "butter_bridge",
+                article_id: 9,
+                votes: 18,
+                created_at: "2020-04-06T13:17:00.000Z",
+                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              },
+            });
           });
-        });
-    });
-    it("returns a 200 and the comment with updated negative vote amount", () => {
-      const voteInc = {
-        inc_votes: -6,
-      };
-      return request(app)
-        .patch("/api/comments/1")
-        .send(voteInc)
-        .expect(200)
-        .then(({ body }) => {
-          expect(body).toEqual({
-            comment: {
-              comment_id: 1,
-              author: "butter_bridge",
-              article_id: 9,
-              votes: 10,
-              created_at: "2020-04-06T13:17:00.000Z",
-              body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-            },
+      });
+      it("returns a 200 and the comment with updated negative vote amount", () => {
+        const voteInc = {
+          inc_votes: -6,
+        };
+        return request(app)
+          .patch("/api/comments/1")
+          .send(voteInc)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              comment: {
+                comment_id: 1,
+                author: "butter_bridge",
+                article_id: 9,
+                votes: 10,
+                created_at: "2020-04-06T13:17:00.000Z",
+                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              },
+            });
           });
-        });
-    });
+      });
 
-    it("returns a 200 and the comment when a blank body has been received", () => {
-      const voteInc = {};
-      return request(app)
-        .patch("/api/comments/1")
-        .send(voteInc)
-        .expect(200)
-        .then(({ body }) => {
-          expect(body).toEqual({
-            comment: {
-              comment_id: 1,
-              author: "butter_bridge",
-              article_id: 9,
-              votes: 16,
-              created_at: "2020-04-06T13:17:00.000Z",
-              body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-            },
+      it("returns a 200 and the comment when a blank body has been received", () => {
+        const voteInc = {};
+        return request(app)
+          .patch("/api/comments/1")
+          .send(voteInc)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              comment: {
+                comment_id: 1,
+                author: "butter_bridge",
+                article_id: 9,
+                votes: 16,
+                created_at: "2020-04-06T13:17:00.000Z",
+                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              },
+            });
           });
-        });
-    });
-    it("returns a 404 and a message when given a commentId that does not exist", () => {
-      const voteInc = {
-        inc_votes: -6,
-      };
+      });
+      it("returns a 404 and a message when given a commentId that does not exist", () => {
+        const voteInc = {
+          inc_votes: -6,
+        };
 
-      return request(app)
-        .patch("/api/comments/123578")
-        .send(voteInc)
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.message).toBe("Resource not found");
-        });
-    });
-    it("returns a 400 and a message when given a commentId that has the incorrect data type", () => {
-      const voteInc = {
-        inc_votes: 3,
-      };
+        return request(app)
+          .patch("/api/comments/123578")
+          .send(voteInc)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Resource not found");
+          });
+      });
+      it("returns a 400 and a message when given a commentId that has the incorrect data type", () => {
+        const voteInc = {
+          inc_votes: 3,
+        };
 
-      return request(app)
-        .patch("/api/comments/apple")
-        .send(voteInc)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.message).toBe("Invalid input");
-        });
-    });
-    it("returns a 400 and a message when given the wrong body key", () => {
-      const badVoteInc = {
-        inc_votes_bad: 3,
-      };
+        return request(app)
+          .patch("/api/comments/apple")
+          .send(voteInc)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Invalid input");
+          });
+      });
+      it("returns a 400 and a message when given the wrong body key", () => {
+        const badVoteInc = {
+          inc_votes_bad: 3,
+        };
 
-      return request(app)
-        .patch("/api/comments/1")
-        .send(badVoteInc)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.message).toBe("Invalid field body");
-        });
-    });
-    it("returns a 400 and a psql error message when given the wrong body value data type", () => {
-      const badVoteInc = {
-        inc_votes: "apple",
-      };
+        return request(app)
+          .patch("/api/comments/1")
+          .send(badVoteInc)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Invalid field body");
+          });
+      });
+      it("returns a 400 and a psql error message when given the wrong body value data type", () => {
+        const badVoteInc = {
+          inc_votes: "apple",
+        };
 
-      return request(app)
-        .patch("/api/comments/1")
-        .send(badVoteInc)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.message).toBe("Invalid input");
-        });
-    });
-    it("returns a 400 and a messaeg when inc_votes is null", () => {
-      const nullVoteInc = {
-        inc_votes: null,
-      };
+        return request(app)
+          .patch("/api/comments/1")
+          .send(badVoteInc)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Invalid input");
+          });
+      });
+      it("returns a 400 and a message when inc_votes is null", () => {
+        const nullVoteInc = {
+          inc_votes: null,
+        };
 
-      return request(app)
-        .patch("/api/comments/1")
-        .send(nullVoteInc)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.message).toBe("Fields cannot be null values");
-        });
+        return request(app)
+          .patch("/api/comments/1")
+          .send(nullVoteInc)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Fields cannot be null values");
+          });
+      });
+    });
+    describe("update body on a comment", () => {
+      it("updates body for a comment and responds with a 200 response", () => {
+        const newCommentBody = { body: "This is a great comment!" };
+        return request(app)
+          .patch("/api/comments/1")
+          .send(newCommentBody)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comment.body).toBe("This is a great comment!");
+            expect(body).toEqual({
+              comment: {
+                article_id: 9,
+                author: "butter_bridge",
+                body: "This is a great comment!",
+                comment_id: 1,
+                created_at: "2020-04-06T13:17:00.000Z",
+                votes: 16,
+              },
+            });
+          });
+      });
+
+      it("returns a 400 when attempting to send a body with a key that is invalid", () => {
+        const badCommentBody = {
+          body: "This is a great comment!",
+          fakeKey: "This should not work",
+        };
+        return request(app)
+          .patch("/api/comments/1")
+          .send(badCommentBody)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Invalid field body");
+          });
+      });
+      it("returns a 404 when trying to update a comment that does not exist", () => {
+        const commentBody = {
+          body: "This is a great comment!",
+        };
+        return request(app)
+          .patch("/api/comments/99999")
+          .send(commentBody)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Resource not found");
+          });
+      });
     });
   });
 });

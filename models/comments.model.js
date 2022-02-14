@@ -16,7 +16,7 @@ exports.removeComment = async (id) => {
   }
 };
 
-exports.updateComment = async (id, voteInc) => {
+exports.updateCommentVotes = async (id, voteInc) => {
   const query = `UPDATE
                   comments
                 SET
@@ -36,6 +36,31 @@ exports.updateComment = async (id, voteInc) => {
   }
 
   const result = await db.query(query, [id, voteInc.inc_votes]);
+
+  if (result.rows.length > 0) {
+    return result.rows[0];
+  } else {
+    return await checkExists("comments", "comment_id", id);
+  }
+};
+
+exports.updateCommentBody = async (id, newCommentBody) => {
+  const query = `UPDATE comments
+                SET
+                  body = $1
+                WHERE
+                  comment_id = $2
+                RETURNING *`;
+
+  const validFields = ["body"];
+
+  for (let key in newCommentBody) {
+    if (!validFields.includes(key)) {
+      throw "Invalid field body";
+    }
+  }
+
+  const result = await db.query(query, [newCommentBody.body, id]);
 
   if (result.rows.length > 0) {
     return result.rows[0];
