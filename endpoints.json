@@ -156,5 +156,15 @@
       "avatar_url": "Bat_signal.jpg",
       "name": "Not_Bruce_Wayne"
     }
+  },
+  "PATCH /API/users/:username": {
+    "description": "updates user depending on depending on request body. Key of 'name' will update the name and key of 'avatar_url' will update the avatar_url of user. You can update both if the request body contains both keys. Endpoint returns with a status of 200 if successful.",
+    "params": ["username"],
+    "exampleRequestBody": { "name": "Thor" },
+    "exampleResponse": {
+      "username": "ThunderGod",
+      "avatar_url": "Mjolnir.jpg",
+      "name": "Thor"
+    }
   }
 }
