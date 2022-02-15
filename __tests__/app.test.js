@@ -631,14 +631,16 @@ describe("/api/articles", () => {
         .expect(201)
         .then(({ body }) => {
           expect(body).toEqual({
-            author: "icellusedkars",
-            title: "Posting is fun!",
-            body: "Posting is the new getting! By posting you create new....",
-            topic: "cats",
-            article_id: 13,
-            votes: 0,
-            created_at: expect.any(String),
-            comment_count: 0,
+            article: {
+              author: "icellusedkars",
+              title: "Posting is fun!",
+              body: "Posting is the new getting! By posting you create new....",
+              topic: "cats",
+              article_id: 13,
+              votes: 0,
+              created_at: expect.any(String),
+              comment_count: 0,
+            },
           });
         });
     });

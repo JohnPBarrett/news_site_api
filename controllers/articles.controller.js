@@ -22,7 +22,7 @@ exports.postArticle = async (req, res, next) => {
   try {
     const article = await insertArticle(req.body);
 
-    res.status(201).send(article);
+    res.status(201).send({ article });
   } catch (err) {
     next(err);
   }
