@@ -758,7 +758,7 @@ describe("/api/articles/:articleId/comments", () => {
         });
     });
     describe("Pagination", () => {
-      it("by default the endpoint will only return 10 results and does not have any offsets", () => {
+      it("by default the endpoint will return 10 results and does not have any offsets", () => {
         return request(app)
           .get("/api/articles/1/comments")
           .expect(200)
@@ -1146,27 +1146,118 @@ describe("/api/users/:username", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
-            username: "rogersop",
-            avatar_url:
-              "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
-            name: "paul",
+            user: {
+              username: "rogersop",
+              avatar_url:
+                "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+              name: "paul",
+            },
           });
         });
     });
-    it("returns a status of 400 and an error message when attempting to retrieve a user that does not exist", () => {
+    it("returns a status of 404 and an error message when attempting to retrieve a user that does not exist", () => {
       return request(app)
         .get("/api/users/MrBean")
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("User does not exist");
+          expect(body.message).toBe("Resource not found");
         });
     });
-    it("returns a status of 400 and an error message when attempting use an invalid value", () => {
+  });
+  describe("PATCH", () => {
+    it("returns an updated user with a status code of 200", () => {
+      const userBody = { name: "aName", avatar_url: "anAvatar!" };
       return request(app)
-        .get("/api/users/1")
+        .patch("/api/users/rogersop")
+        .send(userBody)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.user.name).toBe("aName");
+          expect(body.user.avatar_url).toBe("anAvatar!");
+          expect(body).toEqual({
+            user: {
+              username: "rogersop",
+              name: "aName",
+              avatar_url: "anAvatar!",
+            },
+          });
+        });
+    });
+
+    it("returns an updated user with an updated name with status code of 200", () => {
+      const userBody = { name: "aName" };
+      return request(app)
+        .patch("/api/users/rogersop")
+        .send(userBody)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.user.name).toBe("aName");
+          expect(body).toEqual({
+            user: {
+              username: "rogersop",
+              name: "aName",
+              avatar_url:
+                "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+            },
+          });
+        });
+    });
+    it("returns an updated user with an updated avatar_url with status code of 200", () => {
+      const userBody = { avatar_url: "test" };
+      return request(app)
+        .patch("/api/users/rogersop")
+        .send(userBody)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.user.name).toBe("paul");
+          expect(body).toEqual({
+            user: {
+              username: "rogersop",
+              name: "paul",
+              avatar_url: "test",
+            },
+          });
+        });
+    });
+    it("returns an unchanged user when receiving a blank body", () => {
+      const userBody = {};
+      return request(app)
+        .patch("/api/users/rogersop")
+        .send(userBody)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            user: {
+              username: "rogersop",
+              name: "paul",
+              avatar_url:
+                "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+            },
+          });
+        });
+    });
+    it("return a 404 when trying to update a user that does not exist", () => {
+      const userBody = { avatar_url: "anAvatar!" };
+      return request(app)
+        .patch("/api/users/sonic")
+        .send(userBody)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).toBe("Resource not found");
+        });
+    });
+    it("return a 400 when trying to update with an invalid key", () => {
+      const userBody = {
+        avatar_url: "anAvatar!",
+        name: "sonic",
+        badKey: "jaa",
+      };
+      return request(app)
+        .patch("/api/users/rogersop")
+        .send(userBody)
         .expect(400)
         .then(({ body }) => {
-          expect(body.message).toBe("User does not exist");
+          expect(body.message).toBe("Invalid field body");
         });
     });
   });

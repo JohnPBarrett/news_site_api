@@ -1,4 +1,8 @@
-const { selectUsers, selectUser } = require("../models/users.models");
+const {
+  selectUsers,
+  selectUser,
+  updateUser,
+} = require("../models/users.models");
 
 exports.getUsers = async (req, res, next) => {
   try {
@@ -14,7 +18,20 @@ exports.getUser = async (req, res, next) => {
     const { username } = req.params;
     const user = await selectUser(username);
 
-    res.status(200).send(user);
+    res.status(200).send({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.patchUser = async (req, res, next) => {
+  try {
+    let user;
+    const { username } = req.params;
+
+    user = await updateUser(username, req.body);
+
+    res.status(200).send({ user });
   } catch (err) {
     next(err);
   }
