@@ -21,6 +21,8 @@ exports.handlePsqlErrors = (err, req, res, next) => {
     res.status(400).send({ message: "Fields cannot be null values" });
   } else if (err.code === "23503") {
     res.status(400).send({ message: "Value/s violate foreign key restraint" });
+  } else if (err.code === "23505") {
+    res.status(400).send({ message: "Entity already exists" });
   } else {
     next(err);
   }

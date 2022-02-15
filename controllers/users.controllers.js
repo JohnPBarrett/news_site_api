@@ -2,6 +2,7 @@ const {
   selectUsers,
   selectUser,
   updateUser,
+  insertUser,
 } = require("../models/users.models");
 
 exports.getUsers = async (req, res, next) => {
@@ -32,6 +33,15 @@ exports.patchUser = async (req, res, next) => {
     user = await updateUser(username, req.body);
 
     res.status(200).send({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.postUser = async (req, res, next) => {
+  try {
+    user = await insertUser(req.body);
+    res.status(201).send({ user });
   } catch (err) {
     next(err);
   }

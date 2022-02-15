@@ -69,3 +69,26 @@ exports.updateUser = async (username, requestBody) => {
 
   return result.rows[0];
 };
+
+exports.insertUser = async (newUser) => {
+  let query = `INSERT INTO 
+                users(username, name, avatar_url)
+                VALUES 
+                  ($1, $2, $3)
+                RETURNING *;`;
+
+  const validFields = ["username", "name", "avatar_url"];
+
+  for (let key in newUser) {
+    if (!validFields.includes(key)) {
+      throw "Invalid field body";
+    }
+  }
+
+  const result = await db.query(query, [
+    newUser.username,
+    newUser.name,
+    newUser.avatar_url,
+  ]);
+  return result.rows[0];
+};

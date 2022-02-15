@@ -675,7 +675,7 @@ describe("/api/articles", () => {
           expect(body.message).toBe("Value/s violate foreign key restraint");
         });
     });
-    it("returns a status of 400 and an error message when receiving an author value that does not exist", () => {
+    it("returns a status of 400 and an error message when receiving a topic value that does not exist", () => {
       const badArticleBody = {
         author: "icellusedkars",
         title: "Posting is fun!",
@@ -1133,6 +1133,73 @@ describe("/api/users", () => {
         .expect(404)
         .then(({ body }) => {
           expect(body.message).toBe("Path not found");
+        });
+    });
+  });
+  describe("POST", () => {
+    it("returns a 201 status and the new user when posted to endpoints", () => {
+      const newUser = {
+        username: "testUser",
+        name: "USER",
+        avatar_url: "someAvatar",
+      };
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            user: {
+              username: "testUser",
+              name: "USER",
+              avatar_url: "someAvatar",
+            },
+          });
+        });
+    });
+    it("returns a 400 status and an error message when posting with an invalid key", () => {
+      const badUser = {
+        username: "test",
+        namee: "badname",
+        avatar_url: "avatar",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(badUser)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid field body");
+        });
+    });
+    it("returns a 400 status and an error message when posting a user that already exists", () => {
+      const copyUser = {
+        username: "icellusedkars",
+        name: "badname",
+        avatar_url: "avatar",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(copyUser)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Entity already exists");
+        });
+    });
+    it("returns a 400 status and an error message when posting a user with null username", () => {
+      const copyUser = {
+        username: null,
+        name: "badname",
+        avatar_url: "avatar",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(copyUser)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Fields cannot be null values");
         });
     });
   });
