@@ -6,5 +6,5 @@ exports.apiController = async (req, res, next) => {
     "utf-8"
   );
 
-  res.status(200).send(endpointData);
+  res.status(200).send(JSON.parse(endpointData));
 };
