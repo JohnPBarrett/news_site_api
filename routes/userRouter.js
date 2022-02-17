@@ -3,10 +3,10 @@ const {
   getUsers,
   getUser,
   patchUser,
-  postUser,
+  registerUser,
 } = require("../controllers/users.controllers");
 
-userRouter.route("/").get(getUsers).post(postUser);
+userRouter.route("/").get(getUsers).post(registerUser);
 userRouter.route("/:username").get(getUser).patch(patchUser);
 
 module.exports = userRouter;

@@ -4,6 +4,8 @@ const {
   updateUser,
   insertUser,
 } = require("../models/users.models");
+const bcrypt = require("bcrypt");
+const { user } = require("pg/lib/defaults");
 
 exports.getUsers = async (req, res, next) => {
   try {
@@ -38,11 +40,25 @@ exports.patchUser = async (req, res, next) => {
   }
 };
 
-exports.postUser = async (req, res, next) => {
+exports.registerUser = async (req, res, next) => {
   try {
-    user = await insertUser(req.body);
+    const { username, name, password } = req.body;
 
-    res.status(201).send({ user });
+    if (!(username && name && password)) {
+      return res.status(400).send("Missing fields");
+    }
+
+    // need to check if user already exists
+
+    encryptedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = {
+      username,
+      name,
+      password: encryptedPassword,
+    };
+
+    res.status(201).send({ newUser });
   } catch (err) {
     next(err);
   }
