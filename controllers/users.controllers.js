@@ -41,6 +41,7 @@ exports.patchUser = async (req, res, next) => {
 exports.postUser = async (req, res, next) => {
   try {
     user = await insertUser(req.body);
+
     res.status(201).send({ user });
   } catch (err) {
     next(err);
