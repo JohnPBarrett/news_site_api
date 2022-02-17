@@ -72,12 +72,12 @@ exports.updateUser = async (username, requestBody) => {
 
 exports.insertUser = async (newUser) => {
   let query = `INSERT INTO 
-                users(username, name, avatar_url)
+                users(username, name, avatar_url, password)
                 VALUES 
-                  ($1, $2, $3)
+                  ($1, $2, $3, $4)
                 RETURNING *;`;
 
-  const validFields = ["username", "name", "avatar_url"];
+  const validFields = ["username", "name", "avatar_url", "password"];
 
   for (let key in newUser) {
     if (!validFields.includes(key)) {
@@ -89,6 +89,20 @@ exports.insertUser = async (newUser) => {
     newUser.username,
     newUser.name,
     newUser.avatar_url,
+    newUser.password,
   ]);
   return result.rows[0];
+};
+
+exports.checkUserExistsRegistration = async (newUser) => {
+  const query = `SELECT
+                  *
+                  FROM
+                    users
+                  WHERE
+                    username = $1;`;
+
+  const result = await db.query(query, [newUser]);
+
+  return result.rows.length > 0;
 };

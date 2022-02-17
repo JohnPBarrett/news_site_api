@@ -14,7 +14,8 @@ const createUsersTable = async () => {
                 CREATE TABLE users (
                   username VARCHAR(30) UNIQUE PRIMARY KEY,
                   avatar_url TEXT,
-                  name VARCHAR(30) NOT NULL
+                  name VARCHAR(30) NOT NULL,
+                  password CHAR(60)
                 );`;
 
   return db.query(query);

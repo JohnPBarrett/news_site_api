@@ -3,9 +3,10 @@ const {
   selectUser,
   updateUser,
   insertUser,
+  checkUserExistsRegistration,
 } = require("../models/users.models");
 const bcrypt = require("bcrypt");
-const { user } = require("pg/lib/defaults");
+const jwt = require("jsonwebtoken");
 
 exports.getUsers = async (req, res, next) => {
   try {
@@ -42,7 +43,7 @@ exports.patchUser = async (req, res, next) => {
 
 exports.registerUser = async (req, res, next) => {
   try {
-    const { username, name, password } = req.body;
+    const { username, name, avatar_url, password } = req.body;
 
     if (!(username && name && password)) {
       return res.status(400).send("Missing fields");
@@ -50,16 +51,28 @@ exports.registerUser = async (req, res, next) => {
 
     // need to check if user already exists
 
+    const existingUser = await checkUserExistsRegistration(username);
+    if (existingUser) {
+      return res.status(409).send("User already exists");
+    }
+
     encryptedPassword = await bcrypt.hash(password, 10);
 
     const newUser = {
       username,
       name,
+      avatar_url,
       password: encryptedPassword,
     };
 
+    await insertUser(newUser);
+
+    const token = jwt.sign(newUser, process.env.TOKEN_KEY);
+    newUser.token = token;
+
     res.status(201).send({ newUser });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
