@@ -59,7 +59,9 @@ exports.updateUser = async (username, requestBody) => {
     values.push(value);
   }
 
-  query += ` WHERE username = $${values.length + 1} RETURNING *;`;
+  query += ` WHERE username = $${
+    values.length + 1
+  } RETURNING username, name, avatar_url;`;
 
   const result = await db.query(query, [...values, username]);
 
@@ -95,7 +97,7 @@ exports.insertUser = async (newUser) => {
 };
 
 exports.checkUserExists = async (newUser) => {
-  // function used for login and registration 
+  // function used for login and registration
   const query = `SELECT
                   *
                   FROM

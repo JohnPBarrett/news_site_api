@@ -1144,6 +1144,7 @@ describe("/api/users", () => {
         username: "testUser",
         name: "USER",
         avatar_url: "someAvatar",
+        password: "password",
       };
       return request(app)
         .post("/api/users")
@@ -1153,8 +1154,7 @@ describe("/api/users", () => {
           expect(body).toEqual({
             user: {
               username: "testUser",
-              name: "USER",
-              avatar_url: "someAvatar",
+              token: expect.any(String),
             },
           });
         });
@@ -1162,6 +1162,8 @@ describe("/api/users", () => {
     it("returns a 400 status and an error message when posting with an invalid key", () => {
       const badUser = {
         username: "test",
+        password: "password",
+        name: "somename",
         namee: "badname",
         avatar_url: "avatar",
       };
@@ -1174,19 +1176,20 @@ describe("/api/users", () => {
           expect(body.message).toBe("Invalid field body");
         });
     });
-    it("returns a 400 status and an error message when posting a user that already exists", () => {
+    it("returns a 409 status and an error message when posting a user that already exists", () => {
       const copyUser = {
         username: "icellusedkars",
         name: "badname",
         avatar_url: "avatar",
+        password: "someStrongPassword",
       };
 
       return request(app)
         .post("/api/users")
         .send(copyUser)
-        .expect(400)
+        .expect(409)
         .then(({ body }) => {
-          expect(body.message).toBe("Entity already exists");
+          expect(body.message).toBe("User already exists");
         });
     });
     it("returns a 400 status and an error message when posting a user with null username", () => {
@@ -1194,6 +1197,7 @@ describe("/api/users", () => {
         username: null,
         name: "badname",
         avatar_url: "avatar",
+        password: "somePassword",
       };
 
       return request(app)
@@ -1201,7 +1205,7 @@ describe("/api/users", () => {
         .send(copyUser)
         .expect(400)
         .then(({ body }) => {
-          expect(body.message).toBe("Fields cannot be null values");
+          expect(body.message).toBe("Missing fields");
         });
     });
   });

@@ -4,6 +4,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
     "Invalid field body",
     "Invalid sort field",
     "Invalid order field",
+    "User already exists"
   ];
   if (err.status) {
     res.status(err.status).send({ message: err.message });

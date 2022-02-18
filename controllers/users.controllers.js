@@ -43,28 +43,23 @@ exports.patchUser = async (req, res, next) => {
 
 exports.registerUser = async (req, res, next) => {
   try {
-    const { username, name, avatar_url, password } = req.body;
+    const newUser = req.body;
 
-    if (!(username && name && password)) {
-      return res.status(400).send("Missing fields");
+    if (!(newUser.username && newUser.name && newUser.password)) {
+      return res.status(400).send({ message: "Missing fields" });
     }
 
     // need to check if user already exists
 
-    const existingUser = await checkUserExists(username);
+    const existingUser = await checkUserExists(newUser.username);
 
     if (existingUser) {
-      return res.status(409).send("User already exists");
+      throw { status: 409, message: "User already exists" };
     }
 
-    encryptedPassword = await bcrypt.hash(password, 10);
+    encryptedPassword = await bcrypt.hash(newUser.password, 10);
 
-    const newUser = {
-      username,
-      name,
-      avatar_url,
-      password: encryptedPassword,
-    };
+    newUser.password = encryptedPassword;
 
     await insertUser(newUser);
 
@@ -72,6 +67,7 @@ exports.registerUser = async (req, res, next) => {
       { username: newUser.username },
       process.env.TOKEN_KEY
     );
+
     const user = {
       username: newUser.username,
       token,
