@@ -15,20 +15,25 @@ const insertTopicData = async (topicData) => {
 };
 
 const insertUserData = async (userData) => {
-  const query = format(
-    `INSERT INTO
-    users (username, avatar_url, name, password)
-    VALUES
-    %L`,
-    userData.map((user) => [
-      user.username,
-      user.avatar_url,
-      user.name,
-      bcrypt.hash(`${user.username}1`, 10),
-    ])
-  );
-
-  return db.query(query);
+  userData = userData.map(async (user) => {
+    user.password = await bcrypt.hash(`${user.username}1`, 10);
+    return user;
+  });
+  return Promise.all(userData).then((users) => {
+    const query = format(
+      `INSERT INTO
+      users (username, avatar_url, name, password)
+      VALUES
+      %L`,
+      users.map((user) => [
+        user.username,
+        user.avatar_url,
+        user.name,
+        user.password,
+      ])
+    );
+    return db.query(query);
+  });
 };
 
 const insertArticleData = async (articleData) => {
