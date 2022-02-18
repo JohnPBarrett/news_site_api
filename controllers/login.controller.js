@@ -1,19 +1,36 @@
 const jwt = require("jsonwebtoken");
-const { selectUser } = require("../models/users.models");
+const { checkUserExists } = require("../models/users.models");
+const bcrypt = require("bcrypt");
 
 exports.loginUser = async (req, res, next) => {
   try {
-    const { username } = req.body;
-    const user = await selectUser(username);
+    const { username, password } = req.body;
+
+    if (!(username, password)) {
+      return res.status(400).send("Missing fields");
+    }
+
+    let user = await checkUserExists(username);
 
     if (!user) {
       return res.status(401).send("User not found");
     }
-    const token = jwt.sign({ user }, process.env.TOKEN_KEY);
 
-    user.token = token;
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const token = jwt.sign(
+        { username: user.username },
+        process.env.TOKEN_KEY
+      );
 
-    res.status(200).send(user);
+      user = {
+        username: user.username,
+        token,
+      };
+
+      res.status(200).send({ user });
+    } else {
+      res.status(400).send("Invalid credentials");
+    }
   } catch (err) {
     next(err);
   }

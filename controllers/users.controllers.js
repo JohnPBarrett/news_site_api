@@ -3,7 +3,7 @@ const {
   selectUser,
   updateUser,
   insertUser,
-  checkUserExistsRegistration,
+  checkUserExists,
 } = require("../models/users.models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -51,7 +51,8 @@ exports.registerUser = async (req, res, next) => {
 
     // need to check if user already exists
 
-    const existingUser = await checkUserExistsRegistration(username);
+    const existingUser = await checkUserExists(username);
+
     if (existingUser) {
       return res.status(409).send("User already exists");
     }
@@ -67,12 +68,17 @@ exports.registerUser = async (req, res, next) => {
 
     await insertUser(newUser);
 
-    const token = jwt.sign(newUser, process.env.TOKEN_KEY);
-    newUser.token = token;
+    const token = jwt.sign(
+      { username: newUser.username },
+      process.env.TOKEN_KEY
+    );
+    const user = {
+      username: newUser.username,
+      token,
+    };
 
-    res.status(201).send({ newUser });
+    res.status(201).send({ user });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };

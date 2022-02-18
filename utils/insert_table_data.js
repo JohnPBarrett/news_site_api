@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const format = require("pg-format");
+const bcrypt = require("bcrypt");
 
 const insertTopicData = async (topicData) => {
   const query = format(
@@ -16,10 +17,15 @@ const insertTopicData = async (topicData) => {
 const insertUserData = async (userData) => {
   const query = format(
     `INSERT INTO
-    users (username, avatar_url, name)
+    users (username, avatar_url, name, password)
     VALUES
     %L`,
-    userData.map((user) => [user.username, user.avatar_url, user.name])
+    userData.map((user) => [
+      user.username,
+      user.avatar_url,
+      user.name,
+      bcrypt.hash(`${user.username}1`, 10),
+    ])
   );
 
   return db.query(query);

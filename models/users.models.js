@@ -94,7 +94,8 @@ exports.insertUser = async (newUser) => {
   return result.rows[0];
 };
 
-exports.checkUserExistsRegistration = async (newUser) => {
+exports.checkUserExists = async (newUser) => {
+  // function used for login and registration 
   const query = `SELECT
                   *
                   FROM
@@ -104,5 +105,5 @@ exports.checkUserExistsRegistration = async (newUser) => {
 
   const result = await db.query(query, [newUser]);
 
-  return result.rows.length > 0;
+  return result.rows[0];
 };
