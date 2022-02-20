@@ -37,6 +37,7 @@ exports.patchUser = async (req, res, next) => {
 
     res.status(200).send({ user });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -65,7 +66,8 @@ exports.registerUser = async (req, res, next) => {
 
     const token = jwt.sign(
       { username: newUser.username },
-      process.env.TOKEN_KEY
+      process.env.TOKEN_KEY,
+      { expiresIn: "600s" }
     );
 
     const user = {
