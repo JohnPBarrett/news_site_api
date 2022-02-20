@@ -25,6 +25,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        
+      - name: Set JWT token
+        run: process.env.TOKEN_KEY = ${{secrets.TOKEN_KEY}}
 
       - name: Run tests
         run: PGDATABASE=my_db PGUSER=test_user PGPASSWORD=test_password npm t
