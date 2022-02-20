@@ -37,7 +37,6 @@ exports.patchUser = async (req, res, next) => {
 
     res.status(200).send({ user });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
@@ -77,6 +76,7 @@ exports.registerUser = async (req, res, next) => {
 
     res.status(201).send({ user });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
