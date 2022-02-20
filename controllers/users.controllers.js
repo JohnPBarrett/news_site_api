@@ -76,6 +76,7 @@ exports.registerUser = async (req, res, next) => {
 
     res.status(201).send({ user });
   } catch (err) {
+
     next(err);
   }
 };
