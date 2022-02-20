@@ -27,6 +27,7 @@ jobs:
         run: npm ci
         
       - name: Set JWT token
+        run: echo "set JWT token"
         env: 
           TOKEN_KEY: ${{secrets.TOKEN_KEY}}
 
