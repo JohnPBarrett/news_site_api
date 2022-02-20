@@ -3,7 +3,7 @@ const {
   selectUser,
   updateUser,
   insertUser,
-  checkUserExists,
+  checkUserExists
 } = require("../models/users.models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -71,12 +71,11 @@ exports.registerUser = async (req, res, next) => {
 
     const user = {
       username: newUser.username,
-      token,
+      token
     };
 
     res.status(201).send({ user });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
