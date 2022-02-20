@@ -26,10 +26,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Set JWT token
-        run: echo "set JWT token"
-        env: 
-          TOKEN_KEY: ${{secrets.TOKEN_KEY}}
+      - name: create env file
+        run: |
+          touch .env
+          echo TOKEN_KEY=${{secrets.TOKEN_KEY}} >> .env
 
       - name: Run tests
         run: PGDATABASE=my_db PGUSER=test_user PGPASSWORD=test_password npm t
