@@ -32,7 +32,7 @@ describe("/api/topics", () => {
             expect(topic).toEqual(
               expect.objectContaining({
                 slug: expect.any(String),
-                description: expect.any(String),
+                description: expect.any(String)
               })
             );
           });
@@ -50,7 +50,7 @@ describe("/api/topics", () => {
     it("returns a 201 response and the newly created topic when receiving a valid topic object", () => {
       const topic = {
         slug: "dogs",
-        description: "dogs are awesome",
+        description: "dogs are awesome"
       };
       return request(app)
         .post("/api/topics")
@@ -59,14 +59,14 @@ describe("/api/topics", () => {
         .then(({ body }) => {
           expect(body).toEqual({
             slug: "dogs",
-            description: "dogs are awesome",
+            description: "dogs are awesome"
           });
         });
     });
     it("returns a 400 and error message when receiving an invalid field", () => {
       const badTopic = {
         snail: "dogs",
-        description: "dogs are awesome",
+        description: "dogs are awesome"
       };
       return request(app)
         .post("/api/topics")
@@ -79,7 +79,7 @@ describe("/api/topics", () => {
     it("returns a 400 and error message when receiving a null value", () => {
       const badTopic = {
         slug: null,
-        description: "dogs are awesome",
+        description: "dogs are awesome"
       };
       return request(app)
         .post("/api/topics")
@@ -108,8 +108,8 @@ describe("/api/articles/:articleId", () => {
               topic: "mitch",
               created_at: "2020-07-09T21:11:00.000Z",
               votes: 100,
-              comment_count: 11,
-            },
+              comment_count: 11
+            }
           });
         });
     });
@@ -127,8 +127,8 @@ describe("/api/articles/:articleId", () => {
               topic: "mitch",
               created_at: "2020-10-16T06:03:00.000Z",
               votes: 0,
-              comment_count: 0,
-            },
+              comment_count: 0
+            }
           });
         });
     });
@@ -166,8 +166,8 @@ describe("/api/articles/:articleId", () => {
                 body: "I find this existence challenging",
                 topic: "mitch",
                 created_at: "2020-07-09T21:11:00.000Z",
-                votes: 110,
-              },
+                votes: 110
+              }
             });
           });
       });
@@ -186,8 +186,8 @@ describe("/api/articles/:articleId", () => {
                 body: "I find this existence challenging",
                 topic: "mitch",
                 created_at: "2020-07-09T21:11:00.000Z",
-                votes: -50,
-              },
+                votes: -50
+              }
             });
           });
       });
@@ -206,8 +206,8 @@ describe("/api/articles/:articleId", () => {
                 body: "I find this existence challenging",
                 topic: "mitch",
                 created_at: "2020-07-09T21:11:00.000Z",
-                votes: 100,
-              },
+                votes: 100
+              }
             });
           });
       });
@@ -270,8 +270,8 @@ describe("/api/articles/:articleId", () => {
                 body: "This is some test text!",
                 topic: "mitch",
                 created_at: "2020-07-09T21:11:00.000Z",
-                votes: 100,
-              },
+                votes: 100
+              }
             });
           });
       });
@@ -291,8 +291,8 @@ describe("/api/articles/:articleId", () => {
                 body: "I find this existence challenging",
                 topic: "mitch",
                 created_at: "2020-07-09T21:11:00.000Z",
-                votes: 100,
-              },
+                votes: 100
+              }
             });
           });
       });
@@ -403,7 +403,7 @@ describe("/api/articles", () => {
                     created_at: expect.any(String),
                     votes: expect.any(Number),
                     comment_count: expect.any(Number),
-                    total_count: expect.any(Number),
+                    total_count: expect.any(Number)
                   })
                 );
               });
@@ -415,7 +415,7 @@ describe("/api/articles", () => {
             .expect(200)
             .then(({ body }) => {
               expect(body.articles).toBeSortedBy("created_at", {
-                descending: true,
+                descending: true
               });
             });
         });
@@ -425,7 +425,7 @@ describe("/api/articles", () => {
             .expect(200)
             .then(({ body }) => {
               expect(body.articles).toBeSortedBy("article_id", {
-                descending: true,
+                descending: true
               });
             });
         });
@@ -586,7 +586,7 @@ describe("/api/articles", () => {
                   created_at: expect.any(String),
                   votes: expect.any(Number),
                   comment_count: expect.any(Number),
-                  total_count: expect.any(Number),
+                  total_count: expect.any(Number)
                 })
               );
             });
@@ -622,7 +622,7 @@ describe("/api/articles", () => {
         author: "icellusedkars",
         title: "Posting is fun!",
         body: "Posting is the new getting! By posting you create new....",
-        topic: "cats",
+        topic: "cats"
       };
 
       return request(app)
@@ -639,8 +639,8 @@ describe("/api/articles", () => {
               article_id: 13,
               votes: 0,
               created_at: expect.any(String),
-              comment_count: 0,
-            },
+              comment_count: 0
+            }
           });
         });
     });
@@ -650,7 +650,7 @@ describe("/api/articles", () => {
         author: "icellusedkars",
         title: "Posting is fun!",
         body: "Posting is the new getting! By posting you create new....",
-        topic: "cats",
+        topic: "cats"
       };
 
       return request(app)
@@ -666,7 +666,7 @@ describe("/api/articles", () => {
         author: "JK Rowling",
         title: "Posting is fun!",
         body: "Posting is the new getting! By posting you create new....",
-        topic: "cats",
+        topic: "cats"
       };
 
       return request(app)
@@ -682,7 +682,7 @@ describe("/api/articles", () => {
         author: "icellusedkars",
         title: "Posting is fun!",
         body: "Posting is the new getting! By posting you create new....",
-        topic: "dogs",
+        topic: "dogs"
       };
 
       return request(app)
@@ -698,7 +698,7 @@ describe("/api/articles", () => {
         author: "icellusedkars",
         title: "Posting is fun!",
         body: null,
-        topic: "dogs",
+        topic: "dogs"
       };
 
       return request(app)
@@ -728,7 +728,7 @@ describe("/api/articles/:articleId/comments", () => {
                 votes: expect.any(Number),
                 created_at: expect.any(String),
                 author: expect.any(String),
-                body: expect.any(String),
+                body: expect.any(String)
               })
             );
           });
@@ -806,7 +806,7 @@ describe("/api/articles/:articleId/comments", () => {
     it("returns a 201 status and the newly created comment", () => {
       const newComment = {
         username: "icellusedkars",
-        body: "This is a test",
+        body: "This is a test"
       };
       return request(app)
         .post("/api/articles/1/comments")
@@ -821,8 +821,8 @@ describe("/api/articles/:articleId/comments", () => {
                 article_id: 1,
                 votes: 0,
                 created_at: expect.any(String),
-                body: newComment.body,
-              },
+                body: newComment.body
+              }
             })
           );
         });
@@ -830,7 +830,7 @@ describe("/api/articles/:articleId/comments", () => {
     it("returns a 400 status when sending a body that contains a key that is invalid", () => {
       const badComment = {
         user: "icellusedkars",
-        body: "This is a test",
+        body: "This is a test"
       };
 
       return request(app)
@@ -844,7 +844,7 @@ describe("/api/articles/:articleId/comments", () => {
     it("returns a 404 status when sending a post request to an article that does not exist but has a valid article id", () => {
       const comment = {
         username: "icellusedkars",
-        body: "This is a test",
+        body: "This is a test"
       };
 
       return request(app)
@@ -858,7 +858,7 @@ describe("/api/articles/:articleId/comments", () => {
     it("returns a 400 status when sending a post request with a null value", () => {
       const badComment = {
         username: "icellusedkars",
-        body: null,
+        body: null
       };
 
       return request(app)
@@ -872,7 +872,7 @@ describe("/api/articles/:articleId/comments", () => {
     it("returns a 404 status when sending a post request with a username that does not exist", () => {
       const badComment = {
         username: "fakeName",
-        body: "Something to write about",
+        body: "Something to write about"
       };
 
       return request(app)
@@ -886,7 +886,7 @@ describe("/api/articles/:articleId/comments", () => {
     it("returns a 400 status when sending a post request with an invalid value for article_id", () => {
       const comment = {
         username: "icellusedkars",
-        body: "This is a test",
+        body: "This is a test"
       };
 
       return request(app)
@@ -935,7 +935,7 @@ describe("/api/comments/:commentId", () => {
     describe("update votes on a comment", () => {
       it("returns a 200 and the comment with updated postive vote amount", () => {
         const voteInc = {
-          inc_votes: 2,
+          inc_votes: 2
         };
         return request(app)
           .patch("/api/comments/1")
@@ -949,14 +949,14 @@ describe("/api/comments/:commentId", () => {
                 article_id: 9,
                 votes: 18,
                 created_at: "2020-04-06T13:17:00.000Z",
-                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-              },
+                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+              }
             });
           });
       });
       it("returns a 200 and the comment with updated negative vote amount", () => {
         const voteInc = {
-          inc_votes: -6,
+          inc_votes: -6
         };
         return request(app)
           .patch("/api/comments/1")
@@ -970,8 +970,8 @@ describe("/api/comments/:commentId", () => {
                 article_id: 9,
                 votes: 10,
                 created_at: "2020-04-06T13:17:00.000Z",
-                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-              },
+                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+              }
             });
           });
       });
@@ -990,14 +990,14 @@ describe("/api/comments/:commentId", () => {
                 article_id: 9,
                 votes: 16,
                 created_at: "2020-04-06T13:17:00.000Z",
-                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-              },
+                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+              }
             });
           });
       });
       it("returns a 404 and a message when given a commentId that does not exist", () => {
         const voteInc = {
-          inc_votes: -6,
+          inc_votes: -6
         };
 
         return request(app)
@@ -1010,7 +1010,7 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 400 and a message when given a commentId that has the incorrect data type", () => {
         const voteInc = {
-          inc_votes: 3,
+          inc_votes: 3
         };
 
         return request(app)
@@ -1023,7 +1023,7 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 400 and a message when given the wrong body key", () => {
         const badVoteInc = {
-          inc_votes_bad: 3,
+          inc_votes_bad: 3
         };
 
         return request(app)
@@ -1036,7 +1036,7 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 400 and a psql error message when given the wrong body value data type", () => {
         const badVoteInc = {
-          inc_votes: "apple",
+          inc_votes: "apple"
         };
 
         return request(app)
@@ -1049,7 +1049,7 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 400 and a message when inc_votes is null", () => {
         const nullVoteInc = {
-          inc_votes: null,
+          inc_votes: null
         };
 
         return request(app)
@@ -1077,8 +1077,8 @@ describe("/api/comments/:commentId", () => {
                 body: "This is a great comment!",
                 comment_id: 1,
                 created_at: "2020-04-06T13:17:00.000Z",
-                votes: 16,
-              },
+                votes: 16
+              }
             });
           });
       });
@@ -1086,7 +1086,7 @@ describe("/api/comments/:commentId", () => {
       it("returns a 400 when attempting to send a body with a key that is invalid", () => {
         const badCommentBody = {
           body: "This is a great comment!",
-          fakeKey: "This should not work",
+          fakeKey: "This should not work"
         };
         return request(app)
           .patch("/api/comments/1")
@@ -1098,7 +1098,7 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 404 when trying to update a comment that does not exist", () => {
         const commentBody = {
-          body: "This is a great comment!",
+          body: "This is a great comment!"
         };
         return request(app)
           .patch("/api/comments/99999")
@@ -1123,7 +1123,7 @@ describe("/api/users", () => {
           body.users.forEach((user) => {
             expect(user).toEqual(
               expect.objectContaining({
-                username: expect.any(String),
+                username: expect.any(String)
               })
             );
           });
@@ -1144,7 +1144,7 @@ describe("/api/users", () => {
         username: "testUser",
         name: "USER",
         avatar_url: "someAvatar",
-        password: "password",
+        password: "password"
       };
       return request(app)
         .post("/api/users")
@@ -1154,8 +1154,8 @@ describe("/api/users", () => {
           expect(body).toEqual({
             user: {
               username: "testUser",
-              token: expect.any(String),
-            },
+              token: expect.any(String)
+            }
           });
         });
     });
@@ -1165,7 +1165,7 @@ describe("/api/users", () => {
         password: "password",
         name: "somename",
         namee: "badname",
-        avatar_url: "avatar",
+        avatar_url: "avatar"
       };
 
       return request(app)
@@ -1181,7 +1181,7 @@ describe("/api/users", () => {
         username: "icellusedkars",
         name: "badname",
         avatar_url: "avatar",
-        password: "someStrongPassword",
+        password: "someStrongPassword"
       };
 
       return request(app)
@@ -1197,7 +1197,7 @@ describe("/api/users", () => {
         username: null,
         name: "badname",
         avatar_url: "avatar",
-        password: "somePassword",
+        password: "somePassword"
       };
 
       return request(app)
@@ -1223,8 +1223,8 @@ describe("/api/users/:username", () => {
               username: "rogersop",
               avatar_url:
                 "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
-              name: "paul",
-            },
+              name: "paul"
+            }
           });
         });
     });
@@ -1251,8 +1251,8 @@ describe("/api/users/:username", () => {
             user: {
               username: "rogersop",
               name: "aName",
-              avatar_url: "anAvatar!",
-            },
+              avatar_url: "anAvatar!"
+            }
           });
         });
     });
@@ -1270,8 +1270,8 @@ describe("/api/users/:username", () => {
               username: "rogersop",
               name: "aName",
               avatar_url:
-                "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
-            },
+                "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+            }
           });
         });
     });
@@ -1287,8 +1287,8 @@ describe("/api/users/:username", () => {
             user: {
               username: "rogersop",
               name: "paul",
-              avatar_url: "test",
-            },
+              avatar_url: "test"
+            }
           });
         });
     });
@@ -1304,8 +1304,8 @@ describe("/api/users/:username", () => {
               username: "rogersop",
               name: "paul",
               avatar_url:
-                "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
-            },
+                "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+            }
           });
         });
     });
@@ -1323,7 +1323,7 @@ describe("/api/users/:username", () => {
       const userBody = {
         avatar_url: "anAvatar!",
         name: "sonic",
-        badKey: "jaa",
+        badKey: "jaa"
       };
       return request(app)
         .patch("/api/users/rogersop")
