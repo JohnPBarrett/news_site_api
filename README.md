@@ -24,7 +24,7 @@ The entire api is written in JavaScript using node.js & express.
 ### Dependencies
 
 * bcrypt 5.x
-* cors 2.8
+* cors 2.x
 * dotenv 14.x
 * express 4.x
 * jsonwebtoken 4.x
