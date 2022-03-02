@@ -23,14 +23,17 @@ The entire api is written in JavaScript using node.js & express.
 
 ### Dependencies
 
+* bcrypt 5.x
+* cors 2.8
 * dotenv 14.x
 * express 4.x
-* nodemon 2.x
+* jsonwebtoken 4.x
 * pg 8.x
 * pg-format 1.x
 
 ### Dev Dependencies
 
+* nodemon 2.x
 * jest 27.x
 * jest-sorted 1.x
 * supertest 6.x
