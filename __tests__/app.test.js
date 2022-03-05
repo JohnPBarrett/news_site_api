@@ -900,6 +900,38 @@ describe("/api/articles/:articleId/comments", () => {
   });
 });
 
+describe("/api/comments", () => {
+  describe("GET", () => {
+    it("returns a status of 200 and an array of comment objects", () => {
+      return request(app)
+        .get("/api/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.comments)).toBe(true);
+          body.comments.forEach((comment) => {
+            expect(comment).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                article_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                body: expect.any(String)
+              })
+            );
+          });
+        });
+    });
+    it("returns a status of 404 when path is incorrect", () => {
+      return request(app)
+        .get("/api/comment")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).toBe("Path not found");
+        });
+    });
+  });
+});
+
 describe("/api/comments/:commentId", () => {
   describe("DELETE", () => {
     it("returns a 204 status and no body when deleting valid comment", () => {

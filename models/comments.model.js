@@ -68,3 +68,14 @@ exports.updateCommentBody = async (id, newCommentBody) => {
     return await checkExists("comments", "comment_id", id);
   }
 };
+
+exports.selectComments = async () => {
+  const query = `SELECT
+                  *
+                FROM
+                  comments;`;
+
+  const result = await db.query(query);
+
+  return result.rows;
+};
