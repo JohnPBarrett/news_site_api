@@ -40,7 +40,7 @@ The entire api is written in JavaScript using node.js & express.
 
 ## Cloning
 
-    git clone https://github.com/Pikaca/news_site_api.git
+    git clone https://github.com/JohnPBarrett/news_site_api.git
     cd new_site_api
     npm i 
   
