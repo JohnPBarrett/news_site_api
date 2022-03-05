@@ -129,6 +129,21 @@
       }
     }
   },
+  "GET /api/comments": {
+    "description": "serves an array of all comments from db",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "author": "Homer",
+          "article_id": 2,
+          "votes": 33,
+          "created_at": "2020-04-06T13:17:00.000Z",
+          "body": "D'oh!"
+        }
+      ]
+    }
+  },
   "DELETE /api/comments/:commentId": {
     "description": "deletes comment corresponding to commentId param and returns a 204 status",
     "params": ["commentId"]
