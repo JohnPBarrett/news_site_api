@@ -818,8 +818,8 @@ describe("/api/articles/:articleId/comments", () => {
       });
     });
   });
-  describe.only("POST", () => {
-    it.only("returns a 201 status and the newly created comment when passed an authorized user", () => {
+  describe("POST", () => {
+    it("returns a 201 status and the newly created comment when passed an authorized user", () => {
       const newComment = {
         username: "authUser",
         body: "This is a test"
@@ -847,12 +847,13 @@ describe("/api/articles/:articleId/comments", () => {
     });
     it("returns a 400 status when sending a body that contains a key that is invalid", () => {
       const badComment = {
-        user: "icellusedkars",
-        body: "This is a test"
+        username: "authUser",
+        bodyy: "This is a test"
       };
 
       return request(app)
         .post("/api/articles/1/comments")
+        .set("authorization", `Bearer ${auth.token}`)
         .send(badComment)
         .expect(400)
         .then(({ body }) => {
@@ -861,12 +862,13 @@ describe("/api/articles/:articleId/comments", () => {
     });
     it("returns a 404 status when sending a post request to an article that does not exist but has a valid article id", () => {
       const comment = {
-        username: "icellusedkars",
+        username: "authUser",
         body: "This is a test"
       };
 
       return request(app)
         .post("/api/articles/1234/comments")
+        .set("authorization", `Bearer ${auth.token}`)
         .send(comment)
         .expect(404)
         .then(({ body }) => {
@@ -875,19 +877,20 @@ describe("/api/articles/:articleId/comments", () => {
     });
     it("returns a 400 status when sending a post request with a null value", () => {
       const badComment = {
-        username: "icellusedkars",
+        username: "authUser",
         body: null
       };
 
       return request(app)
         .post("/api/articles/1/comments")
+        .set("authorization", `Bearer ${auth.token}`)
         .send(badComment)
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe("Fields cannot be null values");
         });
     });
-    it("returns a 404 status when sending a post request with a username that does not exist", () => {
+    it("returns a 401 status when sending a post request with a username that does not exist", () => {
       const badComment = {
         username: "fakeName",
         body: "Something to write about"
@@ -896,19 +899,21 @@ describe("/api/articles/:articleId/comments", () => {
       return request(app)
         .post("/api/articles/1/comments")
         .send(badComment)
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.message).toBe("Resource not found");
+        .expect(401)
+        .then((headers) => {
+          expect(headers.text).toBe("Unauthorized");
         });
     });
     it("returns a 400 status when sending a post request with an invalid value for article_id", () => {
       const comment = {
-        username: "icellusedkars",
+        username: "authUser",
         body: "This is a test"
       };
 
       return request(app)
         .post("/api/articles/apple/comments")
+
+        .set("authorization", `Bearer ${auth.token}`)
         .send(comment)
         .expect(400)
         .then(({ body }) => {

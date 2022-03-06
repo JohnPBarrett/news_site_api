@@ -4,7 +4,6 @@ const { generateAccessToken } = require("../utils/generateAccessToken");
 
 exports.loginUser = async (req, res, next) => {
   try {
-    console.log(req.body);
     const { username, password } = req.body;
 
     if (!(username, password)) {
