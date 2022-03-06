@@ -957,9 +957,15 @@ describe("/api/comments", () => {
 
 describe("/api/comments/:commentId", () => {
   describe("DELETE", () => {
-    it("returns a 204 status and no body when deleting valid comment", () => {
+    it("returns a 204 status and no body when deleting valid comment", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "butter_bridge",
+        password: "butter_bridge1"
+      });
+
       return request(app)
         .delete("/api/comments/1")
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(204)
         .then((response) => {
           expect(response.body).toEqual({});
@@ -969,17 +975,19 @@ describe("/api/comments/:commentId", () => {
           expect(result.rows.length).toBe(0);
         });
     });
-    it("returns a 400 status and an error message when attempting to delete a comment that does not exist", () => {
+    it("returns a 404 status and an error message when attempting to delete a comment that does not exist", async () => {
       return request(app)
         .delete("/api/comments/999999")
-        .expect(400)
+        .set("authorization", `Bearer ${auth.token}`)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("Comment does not exist");
+          expect(body.message).toBe("Resource not found");
         });
     });
-    it("returns a 400 status and an error message when attempting to delete a comment that does not exist", () => {
+    it("returns a 400 status and an error message when attempting to delete a comment that has the wrong data type for commentId", () => {
       return request(app)
         .delete("/api/comments/apple")
+        .set("authorization", `Bearer ${auth.token}`)
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe("Invalid input");
@@ -1163,6 +1171,42 @@ describe("/api/comments/:commentId", () => {
             expect(body.message).toBe("Resource not found");
           });
       });
+    });
+  });
+  describe("GET", () => {
+    it("server responds with 200 response and the test comment", () => {
+      return request(app)
+        .get("/api/comments/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            comment: {
+              comment_id: expect.any(Number),
+              author: expect.any(String),
+              article_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              body: expect.any(String)
+            }
+          });
+        });
+    });
+
+    it("returns with 404 status and sends back message when trying to access an article that does not exist", () => {
+      return request(app)
+        .get("/api/comments/99999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).toBe("Resource not found");
+        });
+    });
+    it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
+      return request(app)
+        .get("/api/comments/apple")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe("Invalid input");
+        });
     });
   });
 });

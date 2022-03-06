@@ -2,13 +2,18 @@ const {
   removeComment,
   updateCommentVotes,
   updateCommentBody,
-  selectComments
+  selectComments,
+  selectComment
 } = require("../models/comments.model");
 
 exports.deleteComment = async (req, res, next) => {
   const { comment_id } = req.params;
-
+  const { username } = req.user;
   try {
+    const result = await selectComment(comment_id);
+    if (username !== result.author) {
+      return res.sendStatus(401);
+    }
     await removeComment(comment_id);
     res.sendStatus(204);
   } catch (err) {
@@ -36,6 +41,16 @@ exports.getComments = async (req, res, next) => {
   try {
     const comments = await selectComments();
     res.status(200).send({ comments });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getComment = async (req, res, next) => {
+  const { comment_id } = req.params;
+  try {
+    const comment = await selectComment(comment_id);
+    res.status(200).send({ comment });
   } catch (err) {
     next(err);
   }
