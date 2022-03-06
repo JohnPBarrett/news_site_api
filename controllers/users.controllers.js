@@ -63,7 +63,7 @@ exports.registerUser = async (req, res, next) => {
 
     await insertUser(newUser);
 
-    const token = generateAccessToken(newUser.username);
+    const token = generateAccessToken(newUser);
 
     const user = {
       username: newUser.username,

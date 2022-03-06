@@ -1,6 +1,6 @@
 const { checkUserExists } = require("../models/users.models");
 const bcrypt = require("bcrypt");
-const generateAccessToken = require("../utils/generateAccessToken");
+const { generateAccessToken } = require("../utils/generateAccessToken");
 
 exports.loginUser = async (req, res, next) => {
   try {
@@ -17,7 +17,7 @@ exports.loginUser = async (req, res, next) => {
     }
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = generateAccessToken(user);
+      const token = generateAccessToken({ username: user.username });
 
       user = {
         username: user.username,

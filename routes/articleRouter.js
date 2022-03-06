@@ -6,11 +6,11 @@ const {
   getArticles,
   deleteArticle,
   getArticleComments,
-  postArticleComment,
+  postArticleComment
 } = require("../controllers/articles.controller");
+const { verifyToken } = require("../middleware/auth");
 
-
-articleRouter.route("/").get( getArticles).post(postArticle);
+articleRouter.route("/").get(getArticles).post(postArticle);
 
 articleRouter
   .route("/:articleId")
@@ -21,6 +21,6 @@ articleRouter
 articleRouter
   .route("/:articleId/comments")
   .get(getArticleComments)
-  .post(postArticleComment);
+  .post(verifyToken, postArticleComment);
 
 module.exports = articleRouter;
