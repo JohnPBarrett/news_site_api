@@ -3,8 +3,24 @@ const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const app = require("../app");
 const request = require("supertest");
+const bcrypt = require("bcrypt");
 
-beforeEach(() => seed(testData));
+const auth = {};
+
+beforeEach(async () => {
+  await seed(testData);
+  const hashedPassword = await bcrypt.hash("test", 1);
+  await db.query(
+    "INSERT INTO users (username, name, avatar_url, password ) VALUES ('authUser', 'testman', 'avatar', $1)",
+    [hashedPassword]
+  );
+  const response = await request(app).post("/api/login").send({
+    username: "authUser",
+    password: "test"
+  });
+
+  auth.token = response.body.user.token;
+});
 afterAll(() => db.end());
 
 describe("/api", () => {
@@ -802,14 +818,16 @@ describe("/api/articles/:articleId/comments", () => {
       });
     });
   });
-  describe("POST", () => {
-    it("returns a 201 status and the newly created comment", () => {
+  describe.only("POST", () => {
+    it.only("returns a 201 status and the newly created comment when passed an authorized user", () => {
       const newComment = {
-        username: "icellusedkars",
+        username: "authUser",
         body: "This is a test"
       };
+
       return request(app)
         .post("/api/articles/1/comments")
+        .set("authorization", `Bearer ${auth.token}`)
         .send(newComment)
         .expect(201)
         .then(({ body }) => {
