@@ -6,7 +6,7 @@ const {
   checkUserExists
 } = require("../models/users.models");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const { generateAccessToken } = require("../utils/generateAccessToken");
 
 exports.getUsers = async (req, res, next) => {
   try {
@@ -63,11 +63,7 @@ exports.registerUser = async (req, res, next) => {
 
     await insertUser(newUser);
 
-    const token = jwt.sign(
-      { username: newUser.username },
-      process.env.TOKEN_KEY,
-      { expiresIn: "600s" }
-    );
+    const token = generateAccessToken(newUser.username);
 
     const user = {
       username: newUser.username,
@@ -76,7 +72,6 @@ exports.registerUser = async (req, res, next) => {
 
     res.status(201).send({ user });
   } catch (err) {
-
     next(err);
   }
 };

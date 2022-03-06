@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
 const { checkUserExists } = require("../models/users.models");
 const bcrypt = require("bcrypt");
+const generateAccessToken = require("../utils/generateAccessToken");
 
 exports.loginUser = async (req, res, next) => {
   try {
@@ -17,15 +17,11 @@ exports.loginUser = async (req, res, next) => {
     }
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign(
-        { username: user.username },
-        process.env.TOKEN_KEY,
-        { expiresIn: "600s" }
-      );
+      const token = generateAccessToken(user);
 
       user = {
         username: user.username,
-        token,
+        token
       };
 
       res.status(200).send({ user });

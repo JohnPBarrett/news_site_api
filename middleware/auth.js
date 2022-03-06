@@ -1,11 +1,13 @@
 const jwt = require("jsonwebtoken");
 
 exports.verifyToken = (req, res, next) => {
-  const token = req.body.user.token;
+  const authHeader = req.header["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
-    return res.status(403).send("Token required for validation");
+    return res.status(401).send("Unauthorized");
   }
+
   try {
     const decoded = jwt.verify(token, process.env.TOKEN_KEY);
     req.user = decoded;
@@ -14,3 +16,4 @@ exports.verifyToken = (req, res, next) => {
   }
   next();
 };
+
