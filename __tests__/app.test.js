@@ -730,50 +730,52 @@ describe("/api/articles", () => {
 
 describe("/api/articles/:articleId/comments", () => {
   describe("GET", () => {
-    it("returns a status of 200 and an array of comments for provided article id", () => {
-      return request(app)
-        .get("/api/articles/1/comments")
-        .expect(200)
-        .then(({ body }) => {
-          expect(Array.isArray(body.comments)).toBe(true);
-          expect(body.comments.length > 1).toBe(true);
-          body.comments.forEach((comment) => {
-            expect(comment).toEqual(
-              expect.objectContaining({
-                comment_id: expect.any(Number),
-                votes: expect.any(Number),
-                created_at: expect.any(String),
-                author: expect.any(String),
-                body: expect.any(String)
-              })
-            );
+    describe("general use testing", () => {
+      it("returns a status of 200 and an array of comments for provided article id", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(Array.isArray(body.comments)).toBe(true);
+            expect(body.comments.length > 1).toBe(true);
+            body.comments.forEach((comment) => {
+              expect(comment).toEqual(
+                expect.objectContaining({
+                  comment_id: expect.any(Number),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                  author: expect.any(String),
+                  body: expect.any(String)
+                })
+              );
+            });
           });
-        });
-    });
-    it("returns a status of 200 and an empty array of comments when article contains 0 comments", () => {
-      return request(app)
-        .get("/api/articles/7/comments")
-        .expect(200)
-        .then(({ body }) => {
-          expect(Array.isArray(body.comments)).toBe(true);
-          expect(body.comments.length === 0).toBe(true);
-        });
-    });
-    it("returns with 404 status and sends back message when trying to access comments on an article that does not exist", () => {
-      return request(app)
-        .get("/api/articles/99999/comments")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.message).toBe("Resource not found");
-        });
-    });
-    it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
-      return request(app)
-        .get("/api/articles/apple/comments")
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.message).toBe("Invalid input");
-        });
+      });
+      it("returns a status of 200 and an empty array of comments when article contains 0 comments", () => {
+        return request(app)
+          .get("/api/articles/7/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(Array.isArray(body.comments)).toBe(true);
+            expect(body.comments.length === 0).toBe(true);
+          });
+      });
+      it("returns with 404 status and sends back message when trying to access comments on an article that does not exist", () => {
+        return request(app)
+          .get("/api/articles/99999/comments")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Resource not found");
+          });
+      });
+      it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
+        return request(app)
+          .get("/api/articles/apple/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Invalid input");
+          });
+      });
     });
     describe("Pagination", () => {
       it("by default the endpoint will return 10 results and does not have any offsets", () => {
@@ -815,6 +817,62 @@ describe("/api/articles/:articleId/comments", () => {
           .then(({ body }) => {
             expect(body.comments.length).toBe(11);
           });
+      });
+    });
+    describe("ordering", () => {
+      it("By default the function returns an array sorted by created_at in descending order", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toBeSortedBy("created_at", {
+              descending: true
+            });
+          });
+      });
+      it("function sorts by provided sort_by query param in descending order", () => {
+        return request(app)
+          .get("/api/articles/1/comments?sort_by=votes")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toBeSortedBy("votes", {
+              descending: true
+            });
+          });
+      });
+      it("function sorts by created_at in order of provided order query param", () => {
+        return request(app)
+          .get("/api/articles/1/comments?order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toBeSortedBy("created_at");
+          });
+      });
+      it("function sorts by both sortBy and in order of provided query params", () => {
+        return request(app)
+          .get("/api/articles/1/comments?sort_by=votes&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toBeSortedBy("votes");
+          });
+      });
+      describe("Error testing", () => {
+        it("Function returns a 400 and an error message when provided a sort_by field that does not exist", () => {
+          return request(app)
+            .get("/api/articles/1/comments?sort_by=apple")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.message).toBe("Invalid sort field");
+            });
+        });
+        it("Function returns a 400 and an error message when provided an invalid order value", () => {
+          return request(app)
+            .get("/api/articles/1/comments?order=lemon")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.message).toBe("Invalid order field");
+            });
+        });
       });
     });
   });

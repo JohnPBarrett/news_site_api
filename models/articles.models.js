@@ -29,7 +29,7 @@ exports.selectArticles = async (params) => {
     "created_at",
     "votes",
     "comment_count",
-    "search",
+    "search"
   ];
   let topic;
 
@@ -94,7 +94,7 @@ exports.insertArticle = async (queryBody) => {
     queryBody.author,
     queryBody.title,
     queryBody.body,
-    queryBody.topic,
+    queryBody.topic
   ]);
 
   let newArticle = result.rows[0];
@@ -177,7 +177,6 @@ exports.removeArticle = async (id) => {
 const sanitiseQuery = (query, params, validFields) => {
   const newParams = { ...params };
   const queryVals = [];
-
   const sortBy = newParams.sort_by || "created_at";
   let order = newParams.order || "DESC";
   let limit;
@@ -249,15 +248,13 @@ exports.selectArticleComments = async (id, params) => {
                 USING 
                   (article_id)
                 WHERE
-                  articles.article_id = $1
-                ORDER BY 
-                  comments.comment_id DESC `;
+                  articles.article_id = $1 `;
   const newParams = { ...params };
-  let [limit, offset] = santiseLimitAndOffset(newParams.limit, newParams.p);
+  const validFields = ["votes", "created_at"];
 
-  query += ` LIMIT ${limit} OFFSET ${offset};`;
+  let [newQuery, _] = sanitiseQuery(query, newParams, validFields);
 
-  const result = await db.query(query, [id]);
+  const result = await db.query(newQuery, [id]);
 
   if (result.rows.length > 0) {
     if (result.rows[0].comment_id === null) {
@@ -305,7 +302,7 @@ exports.insertArticleComment = async (id, queryBody) => {
   const result = await db.query(query, [
     id,
     queryBody.username,
-    queryBody.body,
+    queryBody.body
   ]);
 
   return result.rows[0];
