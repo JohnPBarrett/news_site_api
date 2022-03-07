@@ -635,7 +635,7 @@ describe("/api/articles", () => {
   describe("POST", () => {
     it("returns a status of 201 and a new article when receiving a valid article body", () => {
       const newArticle = {
-        author: "icellusedkars",
+        author: "authUser",
         title: "Posting is fun!",
         body: "Posting is the new getting! By posting you create new....",
         topic: "cats"
@@ -643,12 +643,13 @@ describe("/api/articles", () => {
 
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${auth.token}`)
         .send(newArticle)
         .expect(201)
         .then(({ body }) => {
           expect(body).toEqual({
             article: {
-              author: "icellusedkars",
+              author: "authUser",
               title: "Posting is fun!",
               body: "Posting is the new getting! By posting you create new....",
               topic: "cats",
@@ -663,7 +664,7 @@ describe("/api/articles", () => {
     it("returns a status of 400 and an error message when receiving an article body with an invalid key", () => {
       const badArticleBody = {
         fakekey: "evil",
-        author: "icellusedkars",
+        author: "authUser",
         title: "Posting is fun!",
         body: "Posting is the new getting! By posting you create new....",
         topic: "cats"
@@ -671,13 +672,14 @@ describe("/api/articles", () => {
 
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${auth.token}`)
         .send(badArticleBody)
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe("Invalid field body");
         });
     });
-    it("returns a status of 400 and an error message when receiving an author value that does not exist", () => {
+    it("returns a status of 403 and an error message when receiving an author value that does not exist", () => {
       const badArticleBody = {
         author: "JK Rowling",
         title: "Posting is fun!",
@@ -687,15 +689,16 @@ describe("/api/articles", () => {
 
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${auth.token}`)
         .send(badArticleBody)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.message).toBe("Value/s violate foreign key restraint");
+        .expect(403)
+        .then((body) => {
+          expect(body.text).toBe("Forbidden");
         });
     });
     it("returns a status of 400 and an error message when receiving a topic value that does not exist", () => {
       const badArticleBody = {
-        author: "icellusedkars",
+        author: "authUser",
         title: "Posting is fun!",
         body: "Posting is the new getting! By posting you create new....",
         topic: "dogs"
@@ -703,6 +706,7 @@ describe("/api/articles", () => {
 
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${auth.token}`)
         .send(badArticleBody)
         .expect(400)
         .then(({ body }) => {
@@ -711,7 +715,7 @@ describe("/api/articles", () => {
     });
     it("returns a status of 400 and an error message when receiving null values in body", () => {
       const badArticleBody = {
-        author: "icellusedkars",
+        author: "authUser",
         title: "Posting is fun!",
         body: null,
         topic: "dogs"
@@ -719,6 +723,7 @@ describe("/api/articles", () => {
 
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${auth.token}`)
         .send(badArticleBody)
         .expect(400)
         .then(({ body }) => {

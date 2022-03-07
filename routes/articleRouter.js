@@ -8,9 +8,9 @@ const {
   getArticleComments,
   postArticleComment
 } = require("../controllers/articles.controller");
-const { verifyToken } = require("../middleware/auth");
+const { verifyToken, verifyTokenAuthor } = require("../middleware/auth");
 
-articleRouter.route("/").get(getArticles).post(postArticle);
+articleRouter.route("/").get(getArticles).post(verifyTokenAuthor, postArticle);
 
 articleRouter
   .route("/:articleId")
