@@ -356,9 +356,15 @@ describe("/api/articles/:articleId", () => {
     });
   });
   describe("DELETE", () => {
-    it("returns a 204 error and deletes the article and comments for article specified articleId", () => {
+    it("returns a 204 status and deletes the article and comments for article specified articleId", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "butter_bridge",
+        password: "butter_bridge1"
+      });
+
       return request(app)
         .delete("/api/articles/1")
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(204)
         .then((response) => {
           expect(response.body).toEqual({});
@@ -379,20 +385,45 @@ describe("/api/articles/:articleId", () => {
           expect(commentResult.rows.length).toBe(0);
         });
     });
-    it("returns a 400 error when using wrong data type for articleId parameter", () => {
+    it("returns a 401 error and returns an unauthorized message when trying to delete an article that does not belong to user", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "icellusedkars",
+        password: "icellusedkars1"
+      });
+
+      return request(app)
+        .delete("/api/articles/1")
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
+        .expect(401)
+        .then((headers) => {
+          expect(headers.text).toBe("Unauthorized");
+        });
+    });
+    it("returns a 400 error when using wrong data type for articleId parameter", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "butter_bridge",
+        password: "butter_bridge1"
+      });
+
       return request(app)
         .delete("/api/articles/orange")
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe("Invalid input");
         });
     });
-    it("returns a 400 error when trying to delete an article that does not exists", () => {
+    it("returns a 404 error when trying to delete an article that does not exists", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "butter_bridge",
+        password: "butter_bridge1"
+      });
       return request(app)
         .delete("/api/articles/999999")
-        .expect(400)
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.message).toBe("Article does not exist");
+          expect(body.message).toBe("Resource not found");
         });
     });
   });

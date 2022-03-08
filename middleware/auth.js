@@ -49,6 +49,7 @@ exports.verifyTokenAuthor = (req, res, next) => {
 };
 
 exports.verifyTokenDelete = (req, res, next) => {
+  // To deal with situation where username is not passed in body
   const authHeader = req.headers["authorization"];
 
   const token = authHeader && authHeader.split(" ")[1];

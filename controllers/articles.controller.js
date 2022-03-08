@@ -6,7 +6,7 @@ const {
   removeArticle,
   selectArticles,
   selectArticleComments,
-  insertArticleComment,
+  insertArticleComment
 } = require("../models/articles.models");
 
 exports.getArticles = async (req, res, next) => {
@@ -14,7 +14,6 @@ exports.getArticles = async (req, res, next) => {
     const articles = await selectArticles(req.query);
     res.status(200).send({ articles });
   } catch (err) {
-
     next(err);
   }
 };
@@ -61,6 +60,8 @@ exports.patchArticle = async (req, res, next) => {
 exports.deleteArticle = async (req, res, next) => {
   try {
     const { articleId } = req.params;
+    const article = await selectArticle(articleId);
+    if (req.user.username !== article.author) return res.sendStatus(401);
     await removeArticle(articleId);
     res.sendStatus(204);
   } catch (err) {

@@ -8,7 +8,11 @@ const {
   getArticleComments,
   postArticleComment
 } = require("../controllers/articles.controller");
-const { verifyToken, verifyTokenAuthor } = require("../middleware/auth");
+const {
+  verifyToken,
+  verifyTokenAuthor,
+  verifyTokenDelete
+} = require("../middleware/auth");
 
 articleRouter.route("/").get(getArticles).post(verifyTokenAuthor, postArticle);
 
@@ -16,7 +20,7 @@ articleRouter
   .route("/:articleId")
   .get(getArticle)
   .patch(patchArticle)
-  .delete(deleteArticle);
+  .delete(verifyTokenDelete, deleteArticle);
 
 articleRouter
   .route("/:articleId/comments")
