@@ -4,6 +4,8 @@ const seed = require("../db/seeds/seed.js");
 const app = require("../app");
 const request = require("supertest");
 const bcrypt = require("bcrypt");
+const { checkExists, checkExistsPost } = require("../utils/checkExists.js");
+const { generateAccessToken } = require("../utils/generateAccessToken.js");
 
 const auth = {};
 
@@ -1525,6 +1527,36 @@ describe("/api/users/:username", () => {
         .then(({ body }) => {
           expect(body.message).toBe("Invalid field body");
         });
+    });
+  });
+});
+
+describe("Util functions", () => {
+  describe("checkExists", () => {
+    it("returns an empty array for a valid value", () => {
+      checkExists("articles", "article_id", 1).then((data) => {
+        expect(data).toEqual([]);
+      });
+    });
+  });
+  describe("checkExistsPost", () => {
+    it("returns an empty array for a valid value", () => {
+      checkExistsPost("articles", "article_id", 1).then((data) => {
+        expect(data).toBe("exists");
+      });
+    });
+  });
+  describe("generateAccessToken", () => {
+    it("returns a token when supplied with a valid object", () => {
+      const result = generateAccessToken({ test: "test" });
+      expect(typeof result).toBe("string");
+    });
+    it("returns an error when supplied with an invalid value", () => {
+      try {
+        const result = generateAccessToken("er");
+      } catch (err) {
+        expect(typeof err).toBe("object");
+      }
     });
   });
 });
