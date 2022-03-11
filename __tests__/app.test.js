@@ -277,7 +277,7 @@ describe("/api/articles/:articleId", () => {
           });
       });
     });
-    describe.only("update body in an article", () => {
+    describe("update body in an article", () => {
       it("returns a 200 status and an article with an updated body when receiving valid body and id", async () => {
         const tempAuth = await request(app).post("/api/login").send({
           username: "butter_bridge",
