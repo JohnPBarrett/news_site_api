@@ -19,7 +19,7 @@ articleRouter.route("/").get(getArticles).post(verifyTokenAuthor, postArticle);
 articleRouter
   .route("/:articleId")
   .get(getArticle)
-  .patch(patchArticle)
+  .patch(verifyToken, patchArticle)
   .delete(verifyTokenDelete, deleteArticle);
 
 articleRouter

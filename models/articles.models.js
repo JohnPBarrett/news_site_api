@@ -111,7 +111,7 @@ exports.updateArticleVotes = async (id, voteInc) => {
                   WHERE
                     article_id = $1
                   RETURNING *;`;
-  const validBodyFields = ["inc_votes"];
+  const validBodyFields = ["inc_votes", "username"];
 
   for (let key in voteInc) {
     // To handle case where body has invalid fields
@@ -120,8 +120,8 @@ exports.updateArticleVotes = async (id, voteInc) => {
     }
   }
 
-  if (Object.keys(voteInc).length === 0) {
-    voteInc = { inc_votes: 0 };
+  if (!("inc_votes" in voteInc)) {
+    voteInc.inc_votes = 0;
   }
 
   const result = await db.query(query, [id, voteInc.inc_votes]);
@@ -140,7 +140,7 @@ exports.updateArticleBody = async (id, newArticleBody) => {
                   article_id = $2
                 RETURNING *`;
 
-  const validBodyFields = ["body"];
+  const validBodyFields = ["body", "username"];
 
   for (let key in newArticleBody) {
     // To handle case where body has invalid fields

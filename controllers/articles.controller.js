@@ -45,6 +45,10 @@ exports.patchArticle = async (req, res, next) => {
     let article;
 
     if ("body" in req.body) {
+      const articleReturned = await selectArticle(articleId);
+      if (req.user.username !== articleReturned.author) {
+        return res.status(403).send("Forbidden");
+      }
       article = await updateArticleBody(articleId, req.body);
     } else {
       // The handler for null cases is present in updateArticleVotes

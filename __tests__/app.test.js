@@ -169,10 +169,11 @@ describe("/api/articles/:articleId", () => {
   describe("PATCH", () => {
     describe("update votes in an article", () => {
       it("Returns a 200 status and the updated article when receiving positive vote", () => {
-        const voteInc = { inc_votes: 10 };
+        const voteInc = { inc_votes: 10, username: auth.username };
         return request(app)
           .patch("/api/articles/1")
           .send(voteInc)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body).toEqual({
@@ -189,10 +190,11 @@ describe("/api/articles/:articleId", () => {
           });
       });
       it("Returns a 200 status and the updated article when receiving negative vote", () => {
-        const voteInc = { inc_votes: -150 };
+        const voteInc = { inc_votes: -150, username: auth.username };
         return request(app)
           .patch("/api/articles/1")
           .send(voteInc)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body).toEqual({
@@ -209,10 +211,11 @@ describe("/api/articles/:articleId", () => {
           });
       });
       it("Returns a 200 status and the unchanged article when receiving an empty body", () => {
-        const emptyBody = {};
+        const emptyBody = { username: auth.username };
         return request(app)
           .patch("/api/articles/1")
           .send(emptyBody)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body).toEqual({
@@ -230,52 +233,65 @@ describe("/api/articles/:articleId", () => {
       });
 
       it("returns with 404 status and sends back message when trying to update an article that does not exist", () => {
-        const vote = { inc_votes: 40 };
+        const vote = { inc_votes: 40, username: auth.username };
         return request(app)
           .patch("/api/articles/99999")
           .send(vote)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(404)
           .then(({ body }) => {
             expect(body.message).toBe("Resource not found");
           });
       });
       it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
-        const vote = { inc_votes: 40 };
+        const vote = { inc_votes: 40, username: auth.username };
         return request(app)
           .patch("/api/articles/apple")
           .send(vote)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid input");
           });
       });
       it("returns with 400 status and psql error when trying to update with incorrect value data type", () => {
-        const vote = { inc_votes: "honey" };
+        const vote = { inc_votes: "honey", username: auth.username };
         return request(app)
           .patch("/api/articles/1")
           .send(vote)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid input");
           });
       });
       it("returns with 400 status and invalid field error when sending a body with the wrong field name", () => {
-        const vote = { this_is_wrong: 1 };
+        const vote = { this_is_wrong: 1, username: auth.username };
         return request(app)
           .patch("/api/articles/1")
           .send(vote)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid field body");
           });
       });
     });
-    describe("update body in an article", () => {
-      it("returns a 200 status and an article with an updated body when receiving valid body and id", () => {
-        const articleBody = { body: "This is some test text!" };
+    describe.only("update body in an article", () => {
+      it("returns a 200 status and an article with an updated body when receiving valid body and id", async () => {
+        const tempAuth = await request(app).post("/api/login").send({
+          username: "butter_bridge",
+          password: "butter_bridge1"
+        });
+
+        const articleBody = {
+          body: "This is some test text!",
+          username: tempAuth.body.user.username
+        };
         return request(app)
           .patch("/api/articles/1")
           .send(articleBody)
+          .set("authorization", `Bearer ${tempAuth.body.user.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body.article.body).toBe("This is some test text!");
@@ -292,11 +308,16 @@ describe("/api/articles/:articleId", () => {
             });
           });
       });
-      it("returns a 200 status and an unchanged article when receiving an empty body", () => {
-        const articleBody = {};
+      it("returns a 200 status and an unchanged article when receiving an empty body", async () => {
+        const tempAuth = await request(app).post("/api/login").send({
+          username: "butter_bridge",
+          password: "butter_bridge1"
+        });
+        const articleBody = { username: tempAuth.body.user.username };
         return request(app)
           .patch("/api/articles/1")
           .send(articleBody)
+          .set("authorization", `Bearer ${tempAuth.body.user.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body.article.body).toBe("I find this existence challenging");
@@ -314,41 +335,75 @@ describe("/api/articles/:articleId", () => {
           });
       });
       it("returns a 404 status and an error message when entering an id that is valid but article does not exists", () => {
-        const articleBody = { body: "This is some test text!" };
+        const articleBody = {
+          body: "This is some test text!",
+          username: auth.username
+        };
         return request(app)
           .patch("/api/articles/9999")
           .send(articleBody)
           .expect(404)
+          .set("authorization", `Bearer ${auth.token}`)
           .then(({ body }) => {
             expect(body.message).toBe("Resource not found");
           });
       });
       it("returns a 400 status and an error message when trying to enter an invalid data type for article_id", () => {
-        const articleBody = { body: "This is some test text!" };
+        const articleBody = {
+          body: "This is some test text!",
+          username: auth.username
+        };
 
         return request(app)
           .patch("/api/articles/apple")
           .send(articleBody)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid input");
           });
       });
-      it("returns with 400 status and sends back message when trying to use invalid value for articleId parameter", () => {
-        const commentBody = { body: "this is some text" };
+      it("returns with 403 status and sends back message when trying to update an article that does not belong to logged i user", () => {
+        const commentBody = {
+          body: "this is some text",
+          username: auth.username
+        };
         return request(app)
-          .patch("/api/articles/grapes")
+          .patch("/api/articles/1")
           .send(commentBody)
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.message).toBe("Invalid input");
+          .set("authorization", `Bearer ${auth.token}`)
+          .expect(403)
+          .then((headers) => {
+            expect(headers.text).toBe("Forbidden");
           });
       });
-      it("returns with 400 status and invalid field error when sending a body with the wrong field name", () => {
-        const articleBody = { this_is_wrong: 1, body: "this is some text" };
+      it("returns with 401 status and sends back message when trying to update an article as a user without a token", () => {
+        const commentBody = {
+          body: "this is some text",
+          username: "butter_bridge"
+        };
+        return request(app)
+          .patch("/api/articles/1")
+          .send(commentBody)
+          .expect(401)
+          .then((headers) => {
+            expect(headers.text).toBe("Unauthorized");
+          });
+      });
+      it("returns with 400 status and invalid field error when sending a body with the wrong field name", async () => {
+        const tempAuth = await request(app).post("/api/login").send({
+          username: "butter_bridge",
+          password: "butter_bridge1"
+        });
+        const articleBody = {
+          this_is_wrong: 1,
+          body: "this is some text",
+          username: tempAuth.body.user.username
+        };
         return request(app)
           .patch("/api/articles/1")
           .send(articleBody)
+          .set("authorization", `Bearer ${tempAuth.body.user.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid field body");
