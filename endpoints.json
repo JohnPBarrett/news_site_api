@@ -165,7 +165,7 @@
   },
   "PATCH /api/comments/:commentId": {
     "description": "updates votes on comment  or updates comment body depending on request body. Value of 'inc_votes' will increase votes, value of 'body' will change the body to the requested value. The two are independant, you cannot change body and change votes on same request. Endpoint responds with a 200 status when successful.",
-    "params": ["commentId"],
+    "params": ["commentId", "username"],
     "exampleRequestBody": { "inc_votes": 3 },
     "exampleResponse": {
       "comment": {
