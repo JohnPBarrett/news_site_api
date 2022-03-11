@@ -20,8 +20,7 @@ beforeEach(async () => {
     username: "authUser",
     password: "test"
   });
-
-  auth.token = response.body.user.token;
+  (auth.token = response.body.user.token), (auth.username = "authUser");
 });
 afterAll(() => db.end());
 
@@ -1094,11 +1093,13 @@ describe("/api/comments/:commentId", () => {
     describe("update votes on a comment", () => {
       it("returns a 200 and the comment with updated postive vote amount", () => {
         const voteInc = {
-          inc_votes: 2
+          inc_votes: 2,
+          username: auth.username
         };
         return request(app)
           .patch("/api/comments/1")
           .send(voteInc)
+          .set("Authorization", `Bearer ${auth.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body).toEqual({
@@ -1115,11 +1116,13 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 200 and the comment with updated negative vote amount", () => {
         const voteInc = {
-          inc_votes: -6
+          inc_votes: -6,
+          username: auth.username
         };
         return request(app)
           .patch("/api/comments/1")
           .send(voteInc)
+          .set("Authorization", `Bearer ${auth.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body).toEqual({
@@ -1135,11 +1138,12 @@ describe("/api/comments/:commentId", () => {
           });
       });
 
-      it("returns a 200 and the comment when a blank body has been received", () => {
-        const voteInc = {};
+      it("returns a 200 and the comment when a body that has no voteInc is received", () => {
+        const voteInc = { username: auth.username };
         return request(app)
           .patch("/api/comments/1")
           .send(voteInc)
+          .set("Authorization", `Bearer ${auth.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body).toEqual({
@@ -1156,12 +1160,14 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 404 and a message when given a commentId that does not exist", () => {
         const voteInc = {
-          inc_votes: -6
+          inc_votes: -6,
+          username: auth.username
         };
 
         return request(app)
           .patch("/api/comments/123578")
           .send(voteInc)
+          .set("Authorization", `Bearer ${auth.token}`)
           .expect(404)
           .then(({ body }) => {
             expect(body.message).toBe("Resource not found");
@@ -1169,12 +1175,14 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 400 and a message when given a commentId that has the incorrect data type", () => {
         const voteInc = {
-          inc_votes: 3
+          inc_votes: 3,
+          username: auth.username
         };
 
         return request(app)
           .patch("/api/comments/apple")
           .send(voteInc)
+          .set("Authorization", `Bearer ${auth.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid input");
@@ -1182,12 +1190,14 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 400 and a message when given the wrong body key", () => {
         const badVoteInc = {
-          inc_votes_bad: 3
+          inc_votes_bad: 3,
+          username: auth.username
         };
 
         return request(app)
           .patch("/api/comments/1")
           .send(badVoteInc)
+          .set("Authorization", `Bearer ${auth.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid field body");
@@ -1195,12 +1205,14 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 400 and a psql error message when given the wrong body value data type", () => {
         const badVoteInc = {
-          inc_votes: "apple"
+          inc_votes: "apple",
+          username: auth.username
         };
 
         return request(app)
           .patch("/api/comments/1")
           .send(badVoteInc)
+          .set("Authorization", `Bearer ${auth.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid input");
@@ -1208,24 +1220,65 @@ describe("/api/comments/:commentId", () => {
       });
       it("returns a 400 and a message when inc_votes is null", () => {
         const nullVoteInc = {
-          inc_votes: null
+          inc_votes: null,
+          username: auth.username
         };
 
         return request(app)
           .patch("/api/comments/1")
           .send(nullVoteInc)
+          .set("Authorization", `Bearer ${auth.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Fields cannot be null values");
           });
       });
+      it("returns a 401 and a forbidden message when trying to vote without a token", () => {
+        const voteInc = {
+          inc_votes: 1,
+          username: auth.username
+        };
+
+        return request(app)
+          .patch("/api/comments/1")
+          .send(voteInc)
+          .expect(401)
+          .then((headers) => {
+            expect(headers.text).toBe("Unauthorized");
+          });
+      });
+      it("returns a 403 and an unauthorized message when trying to vote with a username that does not match the token", () => {
+        const voteInc = {
+          inc_votes: 1,
+          username: "badname"
+        };
+
+        return request(app)
+          .patch("/api/comments/1")
+          .send(voteInc)
+          .set("authorization", `Bearer ${auth.token}`)
+          .expect(403)
+          .then((headers) => {
+            expect(headers.text).toBe("Forbidden");
+          });
+      });
     });
     describe("update body on a comment", () => {
-      it("updates body for a comment and responds with a 200 response", () => {
-        const newCommentBody = { body: "This is a great comment!" };
+      it("updates body for a comment and responds with a 200 response", async () => {
+        const tempAuth = await request(app).post("/api/login").send({
+          username: "butter_bridge",
+          password: "butter_bridge1"
+        });
+
+        const newCommentBody = {
+          body: "This is a great comment!",
+          username: tempAuth.body.user.username
+        };
+
         return request(app)
           .patch("/api/comments/1")
           .send(newCommentBody)
+          .set("authorization", `Bearer ${tempAuth.body.user.token}`)
           .expect(200)
           .then(({ body }) => {
             expect(body.comment.body).toBe("This is a great comment!");
@@ -1242,26 +1295,80 @@ describe("/api/comments/:commentId", () => {
           });
       });
 
-      it("returns a 400 when attempting to send a body with a key that is invalid", () => {
+      it("returns a 400 when attempting to send a body with a key that is invalid", async () => {
+        const tempAuth = await request(app).post("/api/login").send({
+          username: "butter_bridge",
+          password: "butter_bridge1"
+        });
+
         const badCommentBody = {
           body: "This is a great comment!",
+          username: tempAuth.body.user.username,
           fakeKey: "This should not work"
         };
+
         return request(app)
           .patch("/api/comments/1")
           .send(badCommentBody)
+          .set("authorization", `Bearer ${tempAuth.body.user.token}`)
           .expect(400)
           .then(({ body }) => {
             expect(body.message).toBe("Invalid field body");
           });
       });
+      it("returns a 403 when attempting to update a comment that does not belong to logged in user", () => {
+        const badCommentBody = {
+          body: "This is a great comment!",
+          username: auth.username
+        };
+
+        return request(app)
+          .patch("/api/comments/1")
+          .send(badCommentBody)
+          .set("authorization", `Bearer ${auth.token}`)
+          .expect(403)
+          .then((headers) => {
+            expect(headers.text).toBe("Forbidden");
+          });
+      });
+      it("returns a 401 when attempting to update a comment without a token", () => {
+        const commentBody = {
+          body: "This is a great comment!",
+          username: "butter_bridge"
+        };
+
+        return request(app)
+          .patch("/api/comments/1")
+          .send(commentBody)
+          .expect(401)
+          .then((headers) => {
+            expect(headers.text).toBe("Unauthorized");
+          });
+      });
+      it("returns a 403 when attempting to update a comment with username that does not match token", () => {
+        const commentBody = {
+          body: "This is a great comment!",
+          username: "some name"
+        };
+
+        return request(app)
+          .patch("/api/comments/1")
+          .send(commentBody)
+          .set("authorization", `Bearer ${auth.token}`)
+          .expect(403)
+          .then((headers) => {
+            expect(headers.text).toBe("Forbidden");
+          });
+      });
       it("returns a 404 when trying to update a comment that does not exist", () => {
         const commentBody = {
-          body: "This is a great comment!"
+          body: "This is a great comment!",
+          username: auth.username
         };
         return request(app)
           .patch("/api/comments/99999")
           .send(commentBody)
+          .set("authorization", `Bearer ${auth.token}`)
           .expect(404)
           .then(({ body }) => {
             expect(body.message).toBe("Resource not found");

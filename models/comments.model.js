@@ -25,12 +25,14 @@ exports.updateCommentVotes = async (id, voteInc) => {
                   comment_id = $1
                 RETURNING *;`;
 
-  if (Object.keys(voteInc).length === 0) {
-    voteInc = { inc_votes: 0 };
+  if (!("inc_votes" in voteInc)) {
+    voteInc.inc_votes = 0;
   }
 
+  const validFields = ["inc_votes", "username"];
+
   for (let key in voteInc) {
-    if (key !== "inc_votes") {
+    if (!validFields.includes(key)) {
       throw "Invalid field body";
     }
   }
@@ -52,7 +54,7 @@ exports.updateCommentBody = async (id, newCommentBody) => {
                   comment_id = $2
                 RETURNING *`;
 
-  const validFields = ["body"];
+  const validFields = ["body", "username"];
 
   for (let key in newCommentBody) {
     if (!validFields.includes(key)) {

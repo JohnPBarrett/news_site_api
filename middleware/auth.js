@@ -13,12 +13,10 @@ exports.verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     if (username !== decoded.username) {
-      console.log(username, decoded.username);
       return res.status(403).send("Forbidden");
     }
     req.user = decoded;
   } catch (err) {
-    console.log(err);
     return res.status(401).send("Invalid Token");
   }
   next();

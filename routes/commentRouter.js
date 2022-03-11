@@ -5,13 +5,13 @@ const {
   getComments,
   getComment
 } = require("../controllers/comments.controller");
-const { verifyTokenDelete } = require("../middleware/auth");
+const { verifyTokenDelete, verifyToken } = require("../middleware/auth");
 
 commentRouter.route("/").get(getComments);
 commentRouter
   .route("/:comment_id")
   .delete(verifyTokenDelete, deleteComment)
-  .patch(patchComment)
+  .patch(verifyToken, patchComment)
   .get(getComment);
 
 module.exports = commentRouter;

@@ -27,6 +27,11 @@ exports.patchComment = async (req, res, next) => {
   try {
     let comment;
     if ("body" in req.body) {
+      const commentReturned = await selectComment(comment_id);
+
+      if (req.user.username !== commentReturned.author) {
+        return res.status(403).send("Forbidden");
+      }
       comment = await updateCommentBody(comment_id, req.body);
     } else {
       comment = await updateCommentVotes(comment_id, req.body);
