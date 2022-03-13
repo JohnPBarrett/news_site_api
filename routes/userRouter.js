@@ -3,10 +3,11 @@ const {
   getUsers,
   getUser,
   patchUser,
-  registerUser,
+  registerUser
 } = require("../controllers/users.controllers");
+const { verifyToken } = require("../middleware/auth");
 
 userRouter.route("/").get(getUsers).post(registerUser);
-userRouter.route("/:username").get(getUser).patch(patchUser);
+userRouter.route("/:username").get(getUser).patch(verifyToken, patchUser);
 
 module.exports = userRouter;

@@ -1595,11 +1595,22 @@ describe("/api/users/:username", () => {
     });
   });
   describe("PATCH", () => {
-    it("returns an updated user with a status code of 200", () => {
-      const userBody = { name: "aName", avatar_url: "anAvatar!" };
+    it("returns an updated user with a status code of 200", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "rogersop",
+        password: "rogersop1"
+      });
+
+      const userBody = {
+        name: "aName",
+        avatar_url: "anAvatar!",
+        username: tempAuth.body.user.username
+      };
+
       return request(app)
         .patch("/api/users/rogersop")
         .send(userBody)
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(200)
         .then(({ body }) => {
           expect(body.user.name).toBe("aName");
@@ -1614,11 +1625,21 @@ describe("/api/users/:username", () => {
         });
     });
 
-    it("returns an updated user with an updated name with status code of 200", () => {
-      const userBody = { name: "aName" };
+    it("returns an updated user with an updated name with status code of 200", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "rogersop",
+        password: "rogersop1"
+      });
+
+      const userBody = {
+        name: "aName",
+        username: tempAuth.body.user.username
+      };
+
       return request(app)
         .patch("/api/users/rogersop")
         .send(userBody)
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(200)
         .then(({ body }) => {
           expect(body.user.name).toBe("aName");
@@ -1632,11 +1653,21 @@ describe("/api/users/:username", () => {
           });
         });
     });
-    it("returns an updated user with an updated avatar_url with status code of 200", () => {
-      const userBody = { avatar_url: "test" };
+    it("returns an updated user with an updated avatar_url with status code of 200", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "rogersop",
+        password: "rogersop1"
+      });
+
+      const userBody = {
+        avatar_url: "test",
+        username: tempAuth.body.user.username
+      };
+
       return request(app)
         .patch("/api/users/rogersop")
         .send(userBody)
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(200)
         .then(({ body }) => {
           expect(body.user.name).toBe("paul");
@@ -1649,11 +1680,20 @@ describe("/api/users/:username", () => {
           });
         });
     });
-    it("returns an unchanged user when receiving a blank body", () => {
-      const userBody = {};
+    it("returns an unchanged user when receiving a blank body", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "rogersop",
+        password: "rogersop1"
+      });
+
+      const userBody = {
+        username: tempAuth.body.user.username
+      };
+
       return request(app)
         .patch("/api/users/rogersop")
         .send(userBody)
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({
@@ -1666,25 +1706,42 @@ describe("/api/users/:username", () => {
           });
         });
     });
-    it("return a 404 when trying to update a user that does not exist", () => {
-      const userBody = { avatar_url: "anAvatar!" };
+    it("return a 404 when trying to update a user that does not exist", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "rogersop",
+        password: "rogersop1"
+      });
+
+      const userBody = {
+        username: tempAuth.body.user.username,
+        avatar_url: "anAvatar!"
+      };
+
       return request(app)
         .patch("/api/users/sonic")
         .send(userBody)
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(404)
         .then(({ body }) => {
           expect(body.message).toBe("Resource not found");
         });
     });
-    it("return a 400 when trying to update with an invalid key", () => {
+    it("return a 400 when trying to update with an invalid key", async () => {
+      const tempAuth = await request(app).post("/api/login").send({
+        username: "rogersop",
+        password: "rogersop1"
+      });
+
       const userBody = {
         avatar_url: "anAvatar!",
         name: "sonic",
+        username: tempAuth.body.user.username,
         badKey: "jaa"
       };
       return request(app)
         .patch("/api/users/rogersop")
         .send(userBody)
+        .set("authorization", `Bearer ${tempAuth.body.user.token}`)
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe("Invalid field body");

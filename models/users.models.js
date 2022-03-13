@@ -34,6 +34,9 @@ exports.selectUser = async (username) => {
 exports.updateUser = async (username, requestBody) => {
   let query = "UPDATE users ";
   const validFields = ["avatar_url", "name"];
+
+  // This is to make sure that user cannot update username
+  delete requestBody.username;
   const values = [];
 
   if (Object.keys(requestBody).length === 0) {
@@ -91,7 +94,7 @@ exports.insertUser = async (newUser) => {
     newUser.username,
     newUser.name,
     newUser.avatar_url,
-    newUser.password,
+    newUser.password
   ]);
   return result.rows[0];
 };
